@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Latham Fiberglass Control Tower — Backhaul Direct</title>
+<style>
+:root{
+  --navy:#152a45; --navy-2:#1d3a5f; --navy-3:#0e1f35;
+  --ink:#1c2733; --ink-2:#45566b; --ink-3:#71839b;
+  --bg:#f3f5f8; --panel:#ffffff; --line:#dde3ec; --line-2:#eef1f6;
+  --blue:#2563a8; --blue-soft:#e8f0fa;
+  --green:#1e7a4c; --green-soft:#e4f3ea;
+  --amber:#9a6a06; --amber-soft:#fcf2da;
+  --red:#b23330; --red-soft:#fbe9e8;
+  --violet:#5b4ba6; --violet-soft:#edeafa;
+  --radius:6px;
+  --shadow:0 1px 2px rgba(21,42,69,.07), 0 1px 6px rgba(21,42,69,.05);
+  font-size:15px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:"Segoe UI","Helvetica Neue",Arial,system-ui,sans-serif;
+  background:var(--bg); color:var(--ink);
+  font-size:.92rem; line-height:1.45;
+}
+button{font:inherit;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--ink)}
+a{color:var(--blue)}
+
+/* ===== App frame ===== */
+.app{display:grid;grid-template-columns:236px 1fr;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
+.topbar{grid-column:1/3;background:var(--navy);color:#fff;display:flex;align-items:center;gap:16px;padding:0 18px;border-bottom:1px solid var(--navy-3)}
+.brandmark{display:flex;align-items:center;gap:10px;min-width:220px}
+.brandmark .bhd{background:#fff;color:var(--navy);font-weight:800;letter-spacing:.4px;border-radius:4px;padding:2px 7px;font-size:.8rem}
+.brandmark .prod{font-weight:600;font-size:.95rem;letter-spacing:.2px}
+.brandmark .prod small{display:block;font-weight:400;font-size:.68rem;color:#a8bcd6;letter-spacing:.4px}
+.topbar .spacer{flex:1}
+.rolebox{display:flex;align-items:center;gap:8px;background:var(--navy-2);border:1px solid #2c4a73;border-radius:6px;padding:5px 10px}
+.rolebox label{font-size:.72rem;color:#a8bcd6}
+.rolebox select{background:transparent;border:0;color:#fff;font-weight:600;outline:none}
+.rolebox select option{color:var(--ink)}
+.viewtag{font-size:.72rem;padding:3px 9px;border-radius:99px;font-weight:700;letter-spacing:.3px}
+.viewtag.internal{background:#33507a;color:#cfe0f5}
+.viewtag.customer{background:#1e7a4c;color:#e4f3ea}
+.envtag{font-size:.7rem;color:#a8bcd6;border:1px dashed #3b5b88;border-radius:5px;padding:3px 8px}
+
+/* ===== Nav ===== */
+.nav{background:var(--navy-3);color:#c3d2e6;overflow-y:auto;padding:14px 0 24px}
+.nav .group{margin-top:14px}
+.nav .group:first-child{margin-top:2px}
+.nav .grouplabel{font-size:.68rem;color:#7d94b3;padding:4px 18px 6px;letter-spacing:.5px}
+.nav a.item{display:flex;align-items:center;gap:10px;color:#c3d2e6;text-decoration:none;padding:8px 18px;font-size:.88rem;border-left:3px solid transparent}
+.nav a.item:hover{background:#152a45;color:#fff}
+.nav a.item.active{background:#152a45;color:#fff;border-left-color:#5a8fd0;font-weight:600}
+.nav a.item .cnt{margin-left:auto;background:#2c4a73;color:#dbe7f6;border-radius:99px;font-size:.68rem;padding:1px 7px}
+.nav a.item .cnt.red{background:var(--red);color:#fff}
+.nav a.item .cnt.amber{background:var(--amber);color:#fff}
+.nav .lockline{margin:16px 14px 0;padding:9px 10px;border:1px solid #2c4a73;border-radius:6px;font-size:.7rem;color:#93a9c6;line-height:1.4}
+.nav .lockline b{color:#cfe0f5}
+
+/* ===== Main ===== */
+.main{overflow-y:auto;padding:20px 24px 60px}
+.viewhead{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.viewhead h1{font-size:1.25rem;font-weight:700;letter-spacing:.1px}
+.viewhead .sub{color:var(--ink-3);font-size:.85rem;margin-top:2px;max-width:70ch}
+.viewhead .actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+.btn{border:1px solid var(--line);background:#fff;border-radius:var(--radius);padding:7px 13px;font-size:.85rem;font-weight:600;color:var(--ink)}
+.btn:hover{border-color:#b9c5d6;background:#fafbfd}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:#1f5591}
+.btn.danger{background:var(--red);border-color:var(--red);color:#fff}
+.btn.ghost{border-color:transparent;color:var(--blue)}
+.btn.sm{padding:4px 9px;font-size:.76rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.card .cardhead{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line-2)}
+.card .cardhead h2{font-size:.92rem;font-weight:700}
+.card .cardhead .hint{color:var(--ink-3);font-size:.76rem}
+.card .cardhead .right{margin-left:auto;display:flex;gap:8px;align-items:center}
+.card .cardbody{padding:14px}
+.card .cardbody.flush{padding:0}
+
+.grid{display:grid;gap:14px}
+.cols-2{grid-template-columns:1fr 1fr}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:1200px){.cols-4{grid-template-columns:repeat(2,1fr)}.cols-3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.app{grid-template-columns:64px 1fr}.nav .grouplabel,.nav a.item span.t,.nav .lockline{display:none}.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ===== KPI tiles ===== */
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow);position:relative}
+.kpi .lbl{font-size:.74rem;color:var(--ink-3);font-weight:600}
+.kpi .val{font-size:1.5rem;font-weight:700;margin-top:2px;letter-spacing:-.3px}
+.kpi .meta{font-size:.72rem;color:var(--ink-3);margin-top:2px}
+.kpi .sig{position:absolute;top:12px;right:12px;width:10px;height:10px;border-radius:99px}
+.sig.g{background:var(--green)} .sig.a{background:#d99b1c} .sig.r{background:var(--red)} .sig.n{background:#9db0c7}
+.kpi .delta{font-size:.72rem;font-weight:700;margin-left:6px}
+.delta.up{color:var(--green)} .delta.down{color:var(--red)}
+
+/* ===== Badges ===== */
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.7rem;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.badge.g{background:var(--green-soft);color:var(--green)}
+.badge.a{background:var(--amber-soft);color:var(--amber)}
+.badge.r{background:var(--red-soft);color:var(--red)}
+.badge.b{background:var(--blue-soft);color:var(--blue)}
+.badge.n{background:#eef1f6;color:var(--ink-2)}
+.badge.v{background:var(--violet-soft);color:var(--violet)}
+.badge.internal{background:#152a45;color:#cfe0f5}
+.dot{display:inline-block;width:8px;height:8px;border-radius:99px;margin-right:6px;vertical-align:1px}
+
+/* ===== Tables ===== */
+table.data{width:100%;border-collapse:collapse;font-size:.83rem}
+table.data th{position:sticky;top:0;text-align:left;background:#f8fafc;border-bottom:1px solid var(--line);padding:8px 12px;font-size:.72rem;color:var(--ink-2);font-weight:700;white-space:nowrap;z-index:2}
+table.data td{border-bottom:1px solid var(--line-2);padding:8px 12px;vertical-align:top}
+table.data tr:hover td{background:#f7fafd}
+table.data tr.clickable{cursor:pointer}
+table.data td .primaryline{font-weight:600}
+table.data td .subline{color:var(--ink-3);font-size:.74rem;margin-top:1px}
+table.data td.num, table.data th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tablewrap{overflow:auto;max-height:560px}
+
+/* ===== Filter bar ===== */
+.filterbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.filterbar select,.filterbar input[type=text],.filterbar input[type=search]{border:1px solid var(--line);border-radius:var(--radius);padding:6px 9px;font-size:.83rem;background:#fff}
+.filterbar .chip{border:1px solid var(--line);border-radius:99px;background:#fff;padding:5px 12px;font-size:.78rem;font-weight:600;color:var(--ink-2)}
+.filterbar .chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+
+/* ===== Forms ===== */
+.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px}
+@media(max-width:1100px){.formgrid{grid-template-columns:repeat(2,1fr)}}
+.field label{display:block;font-size:.74rem;font-weight:700;color:var(--ink-2);margin-bottom:4px}
+.field label .req{color:var(--red)}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:var(--radius);padding:7px 9px;font-size:.85rem;background:#fff}
+.field input:focus,.field select:focus,.field textarea:focus{outline:2px solid #bcd3ec;border-color:var(--blue)}
+.field .fieldnote{font-size:.7rem;color:var(--ink-3);margin-top:3px}
+.field.invalid input,.field.invalid select{border-color:var(--red);background:#fff8f7}
+.field.invalid .fieldnote{color:var(--red);font-weight:600}
+.sectiondivider{grid-column:1/-1;border-top:1px solid var(--line-2);padding-top:10px;margin-top:4px;font-size:.8rem;font-weight:700;color:var(--navy)}
+
+/* ===== Checklist / gates ===== */
+.gate{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-bottom:1px solid var(--line-2)}
+.gate:last-child{border-bottom:0}
+.gate .tick{width:20px;height:20px;border-radius:99px;flex:none;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;margin-top:1px}
+.gate.done .tick{background:var(--green-soft);color:var(--green)}
+.gate.open .tick{background:var(--red-soft);color:var(--red)}
+.gate.warn .tick{background:var(--amber-soft);color:var(--amber)}
+.gate .gt{font-weight:600;font-size:.84rem}
+.gate .gs{font-size:.75rem;color:var(--ink-3)}
+.gatebanner{display:flex;gap:10px;align-items:center;border-radius:var(--radius);padding:10px 14px;font-size:.85rem;font-weight:600;margin-bottom:12px}
+.gatebanner.blocked{background:var(--red-soft);color:var(--red);border:1px solid #eccfce}
+.gatebanner.ready{background:var(--green-soft);color:var(--green);border:1px solid #cbe6d6}
+
+/* ===== Milestones ===== */
+.timeline{list-style:none}
+.timeline li{display:grid;grid-template-columns:22px 1fr auto;gap:10px;padding:7px 0;align-items:start}
+.timeline .node{width:12px;height:12px;border-radius:99px;border:2px solid #b9c5d6;background:#fff;margin:4px auto 0;position:relative}
+.timeline li.done .node{background:var(--green);border-color:var(--green)}
+.timeline li.now .node{background:#fff;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.timeline li .mt{font-size:.83rem;font-weight:600}
+.timeline li.pending .mt{color:var(--ink-3);font-weight:500}
+.timeline li .ms{font-size:.72rem;color:var(--ink-3)}
+.timeline li .mtime{font-size:.72rem;color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ===== Misc ===== */
+.split{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+@media(max-width:1100px){.split{grid-template-columns:1fr}}
+.notice{border-radius:var(--radius);padding:10px 13px;font-size:.8rem;line-height:1.5;border:1px solid}
+.notice.info{background:var(--blue-soft);border-color:#cfe0f3;color:#1d4c7d}
+.notice.warn{background:var(--amber-soft);border-color:#efdcae;color:var(--amber)}
+.notice.danger{background:var(--red-soft);border-color:#eccfce;color:var(--red)}
+.notice.internal{background:#f0f3f8;border-color:#d5deea;color:var(--ink-2)}
+.notice b{font-weight:700}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:4px 12px;font-size:.83rem}
+.kv dt{color:var(--ink-3)}
+.kv dd{font-weight:600}
+.masked{color:var(--ink-3);font-style:italic;font-weight:500}
+.money{font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--line-2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.legend{display:flex;gap:14px;font-size:.72rem;color:var(--ink-3);align-items:center;flex-wrap:wrap}
+.emptystate{padding:44px 20px;text-align:center;color:var(--ink-3)}
+.emptystate .big{font-size:1rem;font-weight:700;color:var(--ink-2);margin-bottom:4px}
+.commrow{padding:10px 12px;border-bottom:1px solid var(--line-2)}
+.commrow:last-child{border-bottom:0}
+.commrow .who{font-size:.76rem;font-weight:700}
+.commrow .when{font-size:.7rem;color:var(--ink-3);margin-left:6px;font-weight:400}
+.commrow .msg{font-size:.82rem;margin-top:2px}
+.commrow.internalnote{background:#f6f8fb;border-left:3px solid var(--navy)}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
+.tabs button{border:0;background:none;padding:8px 14px;font-size:.85rem;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent}
+.tabs button.on{color:var(--navy);border-bottom-color:var(--blue)}
+.pillrow{display:flex;gap:6px;flex-wrap:wrap}
+.minitable{width:100%;border-collapse:collapse;font-size:.8rem}
+.minitable td{padding:5px 8px;border-bottom:1px solid var(--line-2)}
+.minitable td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.minitable tr.total td{border-top:2px solid var(--line);font-weight:700}
+.scorebarrow{display:grid;grid-template-columns:130px 1fr 52px;gap:10px;align-items:center;padding:6px 0;font-size:.8rem}
+.modalback{position:fixed;inset:0;background:rgba(15,28,45,.45);display:none;align-items:flex-start;justify-content:center;padding:60px 20px;z-index:50}
+.modalback.open{display:flex}
+.modal{background:#fff;border-radius:8px;max-width:640px;width:100%;box-shadow:0 10px 40px rgba(10,20,35,.35);max-height:80vh;overflow:auto}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:6px;font-size:.85rem;box-shadow:0 6px 24px rgba(10,20,35,.35);display:none;z-index:60}
+.toast.show{display:block}
+.loading{padding:40px;text-align:center;color:var(--ink-3);font-size:.85rem}
+.spinner{width:22px;height:22px;border:3px solid var(--line);border-top-color:var(--blue);border-radius:99px;margin:0 auto 10px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinner{animation:none}}
+:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brandmark">
+      <span class="bhd">BHD</span>
+      <span class="prod">Latham Fiberglass Control Tower<small>Managed Transportation &middot; Backhaul Direct</small></span>
+    </div>
+    <span class="envtag">Pilot — Jane Lew, WV</span>
+    <div class="spacer"></div>
+    <span class="viewtag internal" id="viewTag">BHD Internal View</span>
+    <div class="rolebox">
+      <label for="roleSel">Signed in as</label>
+      <select id="roleSel" onchange="setRole(this.value)">
+        <optgroup label="Backhaul Direct">
+          <option value="bhd-exec">BHD Executive</option>
+          <option value="bhd-custops">BHD Customer Operations</option>
+          <option value="bhd-capacity">BHD Capacity / Carrier Ops</option>
+          <option value="bhd-billing">BHD Billing &amp; Audit</option>
+        </optgroup>
+        <optgroup label="Latham (Customer Portal)">
+          <option value="latham-exec">Latham Executive</option>
+          <option value="latham-plant">Latham Plant — Jane Lew</option>
+        </optgroup>
+        <optgroup label="Governance">
+          <option value="auditor">Read-Only Auditor</option>
+        </optgroup>
+      </select>
+    </div>
+  </header>
+
+  <nav class="nav" id="sideNav"></nav>
+
+  <main class="main" id="main"></main>
+</div>
+
+<div class="modalback" id="modalBack" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================
+   SEED DATA — Jane Lew, WV pilot + broader Latham network
+   ===================================================== */
+const PLANTS = [
+  {id:'JLW', name:'Jane Lew, WV', status:'Live — Pilot', loadsPerDay:'4–8', gate:'Active'},
+  {id:'DWT', name:'DeWitt, IA', status:'Go/No-Go Gate', loadsPerDay:'10–18 (seasonal)', gate:'Gate review Oct 2026'},
+  {id:'RCK', name:'Rockingham, NC', status:'Go/No-Go Gate', loadsPerDay:'8–14 (seasonal)', gate:'Gate review Nov 2026'},
+  {id:'FUT', name:'Additional facilities', status:'Planned', loadsPerDay:'Up to 30–40 peak', gate:'Post-stabilization'}
+];
+
+/* Internal carrier network — NEVER rendered for customer roles */
+const CARRIERS = [
+  {id:'C-101', name:'Mountaineer Specialized LLC', mc:'MC-882114', dot:'DOT 2911042', domicile:'Clarksburg, WV', equip:'RGN, Step Deck (OD)', contact:'Rita Vance', phone:'(304) 555-0142', email:'dispatch@mtnspecialized.com', status:'Qualified', tier:'Primary — JLW outbound East', incumbent:true, tenderAcc:94, otp:96, otd:93, trackComp:98, claims:0, insurance:'Auto $1M / Cargo $250K — exp 03/2027', odExp:'Extensive (pool shells 8–14 y/o)', notes:'Incumbent. Strong on WV/PA/OH. Owner-op surge capacity in season.'},
+  {id:'C-102', name:'Appalachian Wide Load Co.', mc:'MC-764920', dot:'DOT 2544871', domicile:'Bridgeport, WV', equip:'Step Deck, Extendable', contact:'Doug Metz', phone:'(304) 555-0177', email:'ops@appwideload.com', status:'Qualified', tier:'Backup — JLW all lanes', incumbent:true, tenderAcc:88, otp:91, otd:90, trackComp:92, claims:1, insurance:'Auto $1M / Cargo $250K — exp 11/2026', odExp:'Good; permits self-managed WV/VA/NC', notes:'Reliable backup. Watch tracking app adoption on new drivers.'},
+  {id:'C-103', name:'Blue Ridge Pool Carriers', mc:'MC-903311', dot:'DOT 3120458', domicile:'Roanoke, VA', equip:'Step Deck (pool packages)', contact:'Sam Ellery', phone:'(540) 555-0163', email:'sam@blueridgepool.com', status:'Qualified', tier:'Primary — JLW to Southeast', incumbent:false, tenderAcc:97, otp:95, otd:97, trackComp:100, claims:0, insurance:'Auto $1M / Cargo $500K — exp 06/2027', odExp:'Pool-specific fleet, escort partners in VA/NC/SC', notes:'BHD-sourced. Best OD escort coordination in the SE corridor.'},
+  {id:'C-104', name:'Great Lakes Oversize Inc.', mc:'MC-651208', dot:'DOT 2287930', domicile:'Toledo, OH', equip:'RGN, Step Deck, Escort partners', contact:'Karen Doyle', phone:'(419) 555-0128', email:'kdoyle@gloversize.com', status:'Qualified', tier:'Primary — Midwest (DeWitt readiness)', incumbent:false, tenderAcc:91, otp:93, otd:92, trackComp:95, claims:0, insurance:'Auto $1M / Cargo $250K — exp 01/2027', odExp:'Strong IL/IA/WI permit experience', notes:'Staged for DeWitt gate. Two test loads completed clean.'},
+  {id:'C-105', name:'Tri-State Flatbed Express', mc:'MC-712554', dot:'DOT 2410336', domicile:'Parkersburg, WV', equip:'Flatbed, Step Deck', contact:'Miguel Arroyo', phone:'(681) 555-0119', email:'dispatch@tristateflatbed.com', status:'Conditional', tier:'Overflow only', incumbent:true, tenderAcc:76, otp:84, otd:82, trackComp:71, claims:1, insurance:'Auto $1M / Cargo $100K — exp 09/2026', odExp:'Limited; no escorts', notes:'Cargo limit below shell value on some SKUs. Insurance renewal due this month — hold new tenders until COI received.'},
+  {id:'C-106', name:'Carolina Coastal Haulers', mc:'MC-838472', dot:'DOT 2990125', domicile:'Rockingham, NC', equip:'Step Deck', contact:'Tanya Brooks', phone:'(910) 555-0186', email:'tanya@ccoastalhaulers.com', status:'In Qualification', tier:'Candidate — Rockingham readiness', incumbent:false, tenderAcc:null, otp:null, otd:null, trackComp:null, claims:0, insurance:'Pending COI', odExp:'Claimed; references in review', notes:'Packet 60% complete. Safety review scheduled.'},
+  {id:'C-107', name:'Keystone Heavy Haul', mc:'MC-590211', dot:'DOT 2100457', domicile:'Altoona, PA', equip:'RGN, Multi-axle', contact:'Bill Kerner', phone:'(814) 555-0104', email:'bill@keystonehh.com', status:'Do Not Use', tier:'—', incumbent:false, tenderAcc:52, otp:70, otd:68, trackComp:44, claims:2, insurance:'Lapsed 07/2026', odExp:'Yes, but compliance failures', notes:'DNU: insurance lapse + two unreported delays on OD moves. Re-review no earlier than Q1 2027.'},
+  {id:'C-108', name:'Summit Pilot & Escort Services', mc:'—', dot:'—', domicile:'Charleston, WV', equip:'Pilot cars (lead/chase, height pole)', contact:'Dispatch Desk', phone:'(304) 555-0150', email:'book@summitpilot.com', status:'Qualified Vendor', tier:'Escort network — WV/VA/NC', incumbent:false, tenderAcc:null, otp:null, otd:null, trackComp:null, claims:0, insurance:'GL $1M — exp 05/2027', odExp:'Escort provider', notes:'Preferred escort vendor for WV originations.'}
+];
+
+/* Shipments */
+const SHIPMENTS = [
+  {id:'BHD-26-1041', plant:'JLW', dest:'Splash Pools of Richmond — Richmond, VA', lane:'Jane Lew, WV → Richmond, VA', miles:302, pickup:'Sep 8, 07:00–09:00', delivery:'Sep 9, 08:00–12:00', service:'Standard OD', equip:'Step Deck 53\' + pilot (chase)', product:'2× Corinthian 14 shells (nested)', dims:'35\'10" L × 13\'6" W × 6\'2" H', weight:'6,900 lb', od:true, permits:['WV','VA'], escorts:'1 chase car (VA)', status:'In Transit', milestone:'Departed origin 07:41', risk:'g', track:'ELD ping — 12 min ago', readiness:100, exceptions:[], customerRate:3185, carrierId:'C-103', carrierBuy:2540, passThrough:{permits:190, escorts:325, tolls:38}, apptOrigin:'Confirmed Sep 8 07:00', apptDest:'Confirmed Sep 9 09:00', docs:['Shipment request','Rate confirmation','BOL','WV permit','VA permit'], billing:'Awaiting POD', funding:'Funded', po:'LTH-PO-88214'},
+  {id:'BHD-26-1042', plant:'JLW', dest:'BlueWater Pools — Columbus, OH', lane:'Jane Lew, WV → Columbus, OH', miles:214, pickup:'Sep 8, 10:00–12:00', delivery:'Sep 9, 07:00–09:00', service:'Standard OD', equip:'Step Deck 48\'', product:'1× Olympia 12 shell + 1× spa', dims:'27\'4" L × 11\'11" W × 5\'8" H', weight:'4,300 lb', od:true, permits:['WV','OH'], escorts:'None required', status:'Tender Accepted', milestone:'Equipment confirmed; pickup today 10:00', risk:'g', track:'Tracking link active', readiness:100, exceptions:[], customerRate:2410, carrierId:'C-101', carrierBuy:1925, passThrough:{permits:145, escorts:0, tolls:0}, apptOrigin:'Confirmed Sep 8 10:00', apptDest:'Confirmed Sep 9 07:30', docs:['Shipment request','Rate confirmation','WV permit','OH permit'], billing:'Not yet billable', funding:'Funded', po:'LTH-PO-88217'},
+  {id:'BHD-26-1043', plant:'JLW', dest:'Carolina Backyard Living — Charlotte, NC', lane:'Jane Lew, WV → Charlotte, NC', miles:341, pickup:'Sep 9, 07:00–09:00', delivery:'Sep 10, 13:00–16:00', service:'Standard OD', equip:'Step Deck 53\' + pilots (lead+chase NC)', product:'2× Axiom 16 shells (nested)', dims:'39\'8" L × 15\'11" W × 6\'6" H', weight:'8,150 lb', od:true, permits:['WV','VA','NC'], escorts:'Lead + chase (NC); chase (VA)', status:'Permit Delay', milestone:'NC superload review — ETA tomorrow 10:00', risk:'a', track:'—', readiness:92, exceptions:['EX-2201'], customerRate:4260, carrierId:'C-103', carrierBuy:3390, passThrough:{permits:445, escorts:780, tolls:22}, apptOrigin:'Hold — pending permit', apptDest:'Tentative Sep 10 14:00', docs:['Shipment request','Rate confirmation','WV permit','VA permit'], billing:'Not yet billable', funding:'Funded', po:'LTH-PO-88220'},
+  {id:'BHD-26-1044', plant:'JLW', dest:'Great Escapes Pools — Pittsburgh, PA', lane:'Jane Lew, WV → Pittsburgh, PA', miles:118, pickup:'Sep 9, 08:00–10:00', delivery:'Sep 9, 14:00–16:00', service:'Expedited OD', equip:'Step Deck 48\'', product:'1× Corinthian 16 shell', dims:'31\'9" L × 12\'10" W × 6\'0" H', weight:'4,850 lb', od:true, permits:['WV','PA'], escorts:'None (under PA escort threshold)', status:'Ready to Tender', milestone:'All gates complete — tender window opens 13:00', risk:'g', track:'—', readiness:100, exceptions:[], customerRate:1980, carrierId:null, carrierBuy:1560, passThrough:{permits:160, escorts:0, tolls:14}, apptOrigin:'Confirmed Sep 9 08:00', apptDest:'Confirmed Sep 9 14:30', docs:['Shipment request','Quote'], billing:'Not yet billable', funding:'Funded', po:'LTH-PO-88224'},
+  {id:'BHD-26-1045', plant:'JLW', dest:'Lakeside Pool & Patio — Knoxville, TN', lane:'Jane Lew, WV → Knoxville, TN', miles:356, pickup:'Sep 10, 07:00–09:00', delivery:'Sep 11, 09:00–12:00', service:'Standard OD', equip:'Step Deck 53\'', product:'1× Olympia 14 + 1× tanning ledge', dims:'29\'6" L × 12\'2" W × 5\'10" H', weight:'5,200 lb', od:true, permits:['WV','VA','TN'], escorts:'Chase (TN mountain segment)', status:'Planning', milestone:'Route + permit classification in progress', risk:'a', track:'—', readiness:64, exceptions:['EX-2203'], customerRate:null, carrierId:null, carrierBuy:null, passThrough:{permits:0, escorts:0, tolls:0}, apptOrigin:'Requested', apptDest:'Requested', docs:['Shipment request'], billing:'—', funding:'Pending approval', po:'LTH-PO-88229'},
+  {id:'BHD-26-1046', plant:'JLW', dest:'Premier Aquatics — Virginia Beach, VA', lane:'Jane Lew, WV → Virginia Beach, VA', miles:398, pickup:'Sep 5, 07:00–09:00', delivery:'Sep 6, 10:00–13:00', service:'Standard OD', equip:'Step Deck 53\' + chase (VA)', product:'2× Corinthian 12 shells (nested)', dims:'33\'2" L × 12\'8" W × 6\'1" H', weight:'6,100 lb', od:true, permits:['WV','VA'], escorts:'Chase (VA)', status:'Delivered', milestone:'POD received Sep 6 11:52', risk:'g', track:'Complete', readiness:100, exceptions:[], customerRate:3320, carrierId:'C-101', carrierBuy:2660, passThrough:{permits:185, escorts:340, tolls:41}, apptOrigin:'Completed', apptDest:'Completed', docs:['Shipment request','Rate confirmation','BOL','WV permit','VA permit','POD','Delivery photos (6)'], billing:'Invoiced Sep 7', funding:'Funded', po:'LTH-PO-88190'},
+  {id:'BHD-26-1047', plant:'JLW', dest:'Sunbelt Pools — Atlanta, GA', lane:'Jane Lew, WV → Atlanta, GA', miles:524, pickup:'Sep 4, 08:00–10:00', delivery:'Sep 5, 14:00–17:00', service:'Standard OD', equip:'Step Deck 53\' + pilots (GA)', product:'2× Axiom 14 shells (nested)', dims:'36\'0" L × 14\'2" W × 6\'4" H', weight:'7,400 lb', od:true, permits:['WV','VA','TN','GA'], escorts:'Lead (GA metro)', status:'Delivered — Exception', milestone:'Delivered Sep 5 16:20; gelcoat scuff noted on POD', risk:'r', track:'Complete', readiness:100, exceptions:['EX-2199'], customerRate:4890, carrierId:'C-102', carrierBuy:3910, passThrough:{permits:520, escorts:410, tolls:36}, apptOrigin:'Completed', apptDest:'Completed', docs:['Shipment request','Rate confirmation','BOL','Permits (4)','POD — noted','Damage photos (9)','Claim worksheet'], billing:'Hold — claim review', funding:'Funded', po:'LTH-PO-88183'},
+  {id:'BHD-26-1048', plant:'JLW', dest:'Hoosier Pool Supply — Indianapolis, IN', lane:'Jane Lew, WV → Indianapolis, IN', miles:329, pickup:'Sep 10, 09:00–11:00', delivery:'Sep 11, 08:00–11:00', service:'Standard OD', equip:'Step Deck 48\'', product:'1× Corinthian 14 shell', dims:'29\'10" L × 12\'6" W × 5\'11" H', weight:'4,700 lb', od:true, permits:['WV','OH','IN'], escorts:'None required', status:'Tendered — Awaiting Accept', milestone:'Tender sent 11:05 — deadline 15:00 today', risk:'a', track:'—', readiness:100, exceptions:[], customerRate:2740, carrierId:'C-101', carrierBuy:2180, passThrough:{permits:210, escorts:0, tolls:9}, apptOrigin:'Confirmed Sep 10 09:00', apptDest:'Confirmed Sep 11 08:30', docs:['Shipment request','Rate confirmation (draft)'], billing:'Not yet billable', funding:'Funded', po:'LTH-PO-88231'},
+  {id:'BHD-26-1049', plant:'JLW', dest:'Chesapeake Outdoor — Annapolis, MD', lane:'Jane Lew, WV → Annapolis, MD', miles:231, pickup:'Sep 11, 07:00–09:00', delivery:'Sep 11, 15:00–17:00', service:'Expedited OD', equip:'Step Deck 48\'', product:'1× Olympia 12 shell', dims:'26\'8" L × 11\'10" W × 5\'7" H', weight:'4,100 lb', od:true, permits:['WV','MD'], escorts:'None required', status:'Intake — Data Gaps', milestone:'2 required fields missing', risk:'r', track:'—', readiness:38, exceptions:['EX-2204'], customerRate:null, carrierId:null, carrierBuy:null, passThrough:{permits:0, escorts:0, tolls:0}, apptOrigin:'—', apptDest:'—', docs:['Shipment request (incomplete)'], billing:'—', funding:'—', po:'LTH-PO-88236'},
+  {id:'BHD-26-1050', plant:'JLW', dest:'Riverbend Pools — Louisville, KY', lane:'Jane Lew, WV → Louisville, KY', miles:344, pickup:'Sep 3, 07:00–09:00', delivery:'Sep 4, 09:00–12:00', service:'Standard OD', equip:'Step Deck 53\'', product:'2× Olympia 14 shells (nested)', dims:'31\'0" L × 12\'4" W × 6\'0" H', weight:'6,300 lb', od:true, permits:['WV','KY'], escorts:'None required', status:'Closed', milestone:'Carrier paid Sep 6 · Customer billed Sep 5', risk:'g', track:'Complete', readiness:100, exceptions:[], customerRate:3080, carrierId:'C-102', carrierBuy:2460, passThrough:{permits:175, escorts:0, tolls:12}, apptOrigin:'Completed', apptDest:'Completed', docs:['Full document set (9)'], billing:'Closed', funding:'Funded', po:'LTH-PO-88171'}
+];
+
+/* Exceptions */
+const EXCEPTIONS = [
+  {id:'EX-2199', ship:'BHD-26-1047', type:'Damage', sev:'High', owner:'K. Whitfield (BHD Cust Ops)', created:'Sep 5, 16:40', age:'2.8 days', sla:'Claim packet within 5 business days', root:'Strap contact point on rear shell — gelcoat scuff 14" (cosmetic)', action:'Damage photos collected (9); repair quote requested from dealer-approved gelcoat tech; carrier notified of potential claim', comms:'Dealer + Latham CS notified Sep 5 17:05; update sent Sep 8 09:00', status:'Open — Claim Review', resolution:'—', preventive:'Add edge-protector requirement to load spec for nested Axiom shells'},
+  {id:'EX-2201', ship:'BHD-26-1043', type:'Permit Delay', sev:'Medium', owner:'R. Ostrander (BHD Capacity)', created:'Sep 7, 14:10', age:'1.9 days', sla:'Resolve before pickup −12h', root:'NC width 15\'11" triggers superload engineering review', action:'Expedite fee approved; NCDOT reviewer confirmed ETA Sep 9 10:00; pickup appointment moved with plant', comms:'Plant shipping notified Sep 7 14:30; dealer advised delivery may shift to PM window', status:'Open — On Track', resolution:'—', preventive:'Auto-flag ≥15\'6" width for NC at intake with +1 day permit lead time'},
+  {id:'EX-2203', ship:'BHD-26-1045', type:'Missing Data', sev:'Medium', owner:'M. Delgado (BHD Cust Ops)', created:'Sep 8, 08:15', age:'0.2 days', sla:'24h to complete intake', root:'Unloading method and site-access photos not provided for residential-adjacent delivery', action:'Request sent to dealer via portal; plant CS copied', comms:'Portal request Sep 8 08:20', status:'Open — Waiting on Customer', resolution:'—', preventive:'Make unloading method a hard-required field for dealer destinations'},
+  {id:'EX-2204', ship:'BHD-26-1049', type:'Missing Data', sev:'High', owner:'M. Delgado (BHD Cust Ops)', created:'Sep 8, 07:50', age:'0.2 days', sla:'Expedite — pickup in 72h', root:'Consignee contact phone + delivery appointment requirements missing on expedited request', action:'Called plant shipping office; escalated to dealer sales rep', comms:'Phone + portal Sep 8 08:00', status:'Open — Escalated', resolution:'—', preventive:'Block expedited service level unless consignee contact verified'},
+  {id:'EX-2195', ship:'BHD-26-1046', type:'Accessorial Request', sev:'Low', owner:'T. Nguyen (BHD Billing)', created:'Sep 6, 12:10', age:'Closed', sla:'Approve/deny in 48h', root:'Driver assisted crane rigging at delivery — 1.5h beyond free time', action:'Detention $135 validated against GPS + POD timestamps; approved under threshold', comms:'Latham notified in weekly billing summary', status:'Closed — Approved', resolution:'Detention $135 added to customer invoice with backup', preventive:'—'}
+];
+
+/* Rate cards */
+const RATECARDS = [
+  {lane:'Jane Lew, WV → Richmond, VA', type:'Contract', basis:'All-in OD (1 escort)', rate:'$3,185', expires:'Mar 31, 2027', history:'11 loads · avg $3,204', variance:'-0.6%'},
+  {lane:'Jane Lew, WV → Columbus, OH', type:'Contract', basis:'All-in OD (no escort)', rate:'$2,410', expires:'Mar 31, 2027', history:'14 loads · avg $2,395', variance:'+0.6%'},
+  {lane:'Jane Lew, WV → Charlotte, NC', type:'Contract', basis:'All-in OD (escort sched.)', rate:'$4,260', expires:'Mar 31, 2027', history:'8 loads · avg $4,310', variance:'-1.2%'},
+  {lane:'Jane Lew, WV → Pittsburgh, PA', type:'Contract', basis:'All-in OD', rate:'$1,980', expires:'Mar 31, 2027', history:'16 loads · avg $1,942', variance:'+2.0%'},
+  {lane:'Jane Lew, WV → Atlanta, GA', type:'Contract', basis:'All-in OD (escort sched.)', rate:'$4,890', expires:'Mar 31, 2027', history:'6 loads · avg $4,955', variance:'-1.3%'},
+  {lane:'Jane Lew, WV → Knoxville, TN', type:'Spot', basis:'Quote in progress', rate:'—', expires:'—', history:'2 loads · avg $3,610', variance:'—'},
+  {lane:'Jane Lew, WV → Indianapolis, IN', type:'Contract', basis:'All-in OD', rate:'$2,740', expires:'Mar 31, 2027', history:'9 loads · avg $2,718', variance:'+0.8%'}
+];
+
+/* Billing rows */
+const BILLING = [
+  {ship:'BHD-26-1050', charge:3080, buy:2460, pass:187, invoice:'INV-5512 · Paid', carrierPay:'Paid Sep 6', docs:'Complete', variance:'$0', state:'Closed', sig:'g', funding:'Funded'},
+  {ship:'BHD-26-1046', charge:3320, buy:2660, pass:566, invoice:'INV-5518 · Sent Sep 7', carrierPay:'Scheduled Sep 12', docs:'Complete', variance:'$0', state:'Awaiting customer payment', sig:'g', funding:'Funded'},
+  {ship:'BHD-26-1047', charge:4890, buy:3910, pass:966, invoice:'Hold — claim review', carrierPay:'Hold — claim offset review', docs:'POD noted · claim packet in progress', variance:'Claim TBD', state:'Billing hold', sig:'r', funding:'Funded'},
+  {ship:'BHD-26-1041', charge:3185, buy:2540, pass:553, invoice:'Pending POD', carrierPay:'Pending POD', docs:'Awaiting POD', variance:'—', state:'In transit', sig:'a', funding:'Funded'},
+  {ship:'BHD-26-1045', charge:0, buy:0, pass:0, invoice:'—', carrierPay:'—', docs:'Intake incomplete', variance:'—', state:'Not billable — funding approval pending', sig:'a', funding:'Pending'}
+];
+
+/* Communications on load detail (sample for 1043) */
+const COMMS = {
+ 'BHD-26-1043':[
+  {who:'Latham — Jane Lew Shipping', when:'Sep 7, 13:52', msg:'Any update on the NC permit for the Charlotte pair? Dealer is asking about Wednesday delivery.', internal:false},
+  {who:'BHD Customer Operations', when:'Sep 7, 14:30', msg:'NC width triggered a superload engineering review. We approved the expedite fee and the reviewer has confirmed a decision by Wed 10:00. Pickup is re-slotted to Wed 11:00 and delivery moves to the Thursday PM window. Dealer has been advised.', internal:false},
+  {who:'BHD Capacity Ops', when:'Sep 7, 15:02', msg:'Escorts rebooked with Summit for Thu. Assigned capacity holding equipment — no rebooking risk before Thu 06:00.', internal:true},
+  {who:'Latham — Jane Lew Shipping', when:'Sep 8, 08:10', msg:'Understood, thanks. Please confirm once permit is in hand.', internal:false}
+ ]
+};
+
+/* Contract / governance record */
+const GOVERNANCE = [
+  ['Fiberglass addendum','Executed — Aug 22, 2026','g'],
+  ['Interim operating authorization','Active through addendum term','g'],
+  ['12-month agreement extension','Executed — runs through Aug 31, 2027 (covers two peak seasons)','g'],
+  ['Exclusive managed-transportation scope','All third-party fiberglass transportation in program plants','g'],
+  ['Non-solicitation / non-circumvention','24 months post-termination; applies to BHD-managed carriers','g'],
+  ['Direct-carrier emergency exception','Executive-approved override only; full audit trail required','g'],
+  ['Management fee','Per executed schedule (internal)','n'],
+  ['Bill-pay / audit fee','Per executed schedule (internal)','n'],
+  ['Cost-plus fallback rules','Documented; applies where no contract or spot rate exists','g'],
+  ['Funding & payment terms','Customer funds required before carrier quick-pay release','g'],
+  ['Insurance requirements','Auto $1M / Cargo min $250K (shell value dependent)','g'],
+  ['Claims process','5-business-day packet SLA; photos + repair quote standard','g'],
+  ['Service-level agreements','OTP 95% · OTD 93% · Tracking 95% · Exception ack 2h','g'],
+  ['Reporting requirements','Weekly ops review + monthly scorecard + QBR','g'],
+  ['Transition obligations','Email ingestion + incumbent-carrier onboarding during interim period','a'],
+  ['Termination & data retention','Records retained 7 years; carrier data remains BHD property','g'],
+  ['Plant rollout exhibit','JLW live · DeWitt + Rockingham gated','g'],
+  ['Named decision-makers','Recorded in escalation tree (Admin → Escalation)','g']
+];
+</script>
+<script>
+/* =====================================================
+   ROLES, PERMISSIONS, ROUTER
+   ===================================================== */
+let ROLE = 'bhd-exec';
+let ROUTE = 'dashboard';
+let ROUTE_ARG = null;
+
+const ROLE_META = {
+  'bhd-exec':      {label:'BHD Executive', customer:false, canSeeCarrier:true,  canSeeBuy:true,  billing:true},
+  'bhd-custops':   {label:'BHD Customer Operations', customer:false, canSeeCarrier:true, canSeeBuy:true, billing:true},
+  'bhd-capacity':  {label:'BHD Capacity / Carrier Ops', customer:false, canSeeCarrier:true, canSeeBuy:true, billing:false},
+  'bhd-billing':   {label:'BHD Billing & Audit', customer:false, canSeeCarrier:true, canSeeBuy:true, billing:true},
+  'latham-exec':   {label:'Latham Executive', customer:true, canSeeCarrier:false, canSeeBuy:false, billing:false},
+  'latham-plant':  {label:'Latham Plant — Jane Lew', customer:true, canSeeCarrier:false, canSeeBuy:false, billing:false},
+  'auditor':       {label:'Read-Only Auditor', customer:false, canSeeCarrier:true, canSeeBuy:true, billing:true, readOnly:true}
+};
+const isCust = () => ROLE_META[ROLE].customer;
+const seeCarrier = () => ROLE_META[ROLE].canSeeCarrier;
+const seeBuy = () => ROLE_META[ROLE].canSeeBuy;
+const readOnly = () => !!ROLE_META[ROLE].readOnly;
+
+const NAV = [
+  {group:'Operate', items:[
+    {r:'dashboard', t:'Command Center', icon:'▦', roles:'all'},
+    {r:'board', t:'Live Shipment Board', icon:'☰', roles:'all', cnt:()=>SHIPMENTS.filter(s=>!['Closed','Delivered'].includes(s.status)).length},
+    {r:'intake', t:'New Shipment Request', icon:'✚', roles:'all'},
+    {r:'exceptions', t:'Exception Center', icon:'⚑', roles:'all', cnt:()=>EXCEPTIONS.filter(e=>e.status.startsWith('Open')).length, cntClass:'red'}
+  ]},
+  {group:'Plan & Buy (BHD)', internal:true, items:[
+    {r:'planning', t:'Planning Workspace', icon:'◧', roles:'bhd'},
+    {r:'tender', t:'Tender Management', icon:'⇄', roles:'bhd', cnt:()=>1, cntClass:'amber'},
+    {r:'carriers', t:'Carrier Network', icon:'🔒', roles:'bhd'},
+    {r:'rates', t:'Rate & Cost Governance', icon:'▤', roles:'bhd'}
+  ]},
+  {group:'Settle', items:[
+    {r:'billing', t:'Billing & Reconciliation', icon:'⚖', roles:'billing'},
+    {r:'reports', t:'Reports & Scorecards', icon:'▥', roles:'all'}
+  ]},
+  {group:'Govern', items:[
+    {r:'admin', t:'Administration', icon:'⚙', roles:'bhd'}
+  ]}
+];
+
+function navAllowed(item){
+  if(item.roles==='all') return true;
+  if(item.roles==='bhd') return !isCust();
+  if(item.roles==='billing') return !isCust() && (ROLE_META[ROLE].billing || ROLE==='auditor');
+  return false;
+}
+
+function renderNav(){
+  const nav = document.getElementById('sideNav');
+  let h='';
+  NAV.forEach(g=>{
+    const items = g.items.filter(navAllowed);
+    if(!items.length) return;
+    h += `<div class="group"><div class="grouplabel">${g.group}</div>`;
+    items.forEach(it=>{
+      const active = ROUTE===it.r ? 'active':'';
+      const cnt = it.cnt ? `<span class="cnt ${it.cntClass||''}">${it.cnt()}</span>` : '';
+      h += `<a href="#" class="item ${active}" onclick="go('${it.r}');return false;"><span aria-hidden="true">${it.icon}</span><span class="t">${it.t}</span>${cnt}</a>`;
+    });
+    h += `</div>`;
+  });
+  h += `<div class="lockline">${isCust()
+      ? '<b>Customer-safe view.</b> Capacity is shown by status only. Carrier identity, contacts and BHD buy rates are managed inside Backhaul Direct.'
+      : '<b>BHD internal view.</b> Carrier identity, buy rates and margin are restricted fields — never exposed to customer roles, exports or notifications.'}</div>`;
+  nav.innerHTML = h;
+}
+
+function setRole(r){
+  ROLE = r;
+  const vt = document.getElementById('viewTag');
+  if(isCust()){ vt.textContent='Latham Customer Portal'; vt.className='viewtag customer'; }
+  else if(ROLE==='auditor'){ vt.textContent='Auditor — Read Only (logged)'; vt.className='viewtag internal'; }
+  else { vt.textContent='BHD Internal View'; vt.className='viewtag internal'; }
+  // If current route is not allowed for this role, fall back to dashboard
+  const flat = NAV.flatMap(g=>g.items);
+  const cur = flat.find(i=>i.r===ROUTE);
+  if(cur && !navAllowed(cur)) ROUTE='dashboard';
+  render();
+  toast(`Viewing as ${ROLE_META[ROLE].label}`);
+}
+
+function go(r,arg=null){ ROUTE=r; ROUTE_ARG=arg; render(); document.getElementById('main').scrollTop=0; }
+
+function render(){
+  renderNav();
+  const m=document.getElementById('main');
+  m.innerHTML = `<div class="loading"><div class="spinner"></div>Loading ${ROUTE==='detail'?'shipment':'workspace'}…</div>`;
+  setTimeout(()=>{ m.innerHTML = VIEWS[ROUTE] ? VIEWS[ROUTE]() : VIEWS.dashboard(); wireUp(); }, 120);
+}
+
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), 2600);
+}
+function openModal(html){ document.getElementById('modalBox').innerHTML=html; document.getElementById('modalBack').classList.add('open'); }
+function closeModal(){ document.getElementById('modalBack').classList.remove('open'); }
+
+/* ===== helpers ===== */
+const $money = n => n==null?'—':'$'+n.toLocaleString();
+function statusBadge(s){
+  const map={'In Transit':'b','Tender Accepted':'g','Permit Delay':'a','Ready to Tender':'g','Planning':'n','Delivered':'g','Delivered — Exception':'r','Tendered — Awaiting Accept':'a','Intake — Data Gaps':'r','Closed':'n'};
+  return `<span class="badge ${map[s]||'n'}">${s}</span>`;
+}
+function riskBadge(r){ return {g:'<span class="badge g">Low</span>',a:'<span class="badge a">Watch</span>',r:'<span class="badge r">High</span>'}[r]; }
+function capacityLabel(s){
+  // Customer-safe capacity language
+  if(!s.carrierId){
+    if(s.status==='Ready to Tender') return '<span class="badge b">Qualified Provider Identified</span>';
+    if(s.status==='Tendered — Awaiting Accept') return '<span class="badge a">Tender in Progress</span>';
+    return '<span class="badge n">Capacity Planning</span>';
+  }
+  if(['Delivered','Closed','Delivered — Exception','In Transit'].includes(s.status)) return '<span class="badge g">Carrier Confirmed</span>';
+  return '<span class="badge g">Assigned Capacity — Equipment Confirmed</span>';
+}
+function carrierCell(s){
+  if(!seeCarrier()) return `<div>${capacityLabel(s)}</div>`;
+  if(!s.carrierId) return `<div>${capacityLabel(s)}</div><div class="subline">No carrier assigned yet</div>`;
+  const c=CARRIERS.find(c=>c.id===s.carrierId);
+  return `<div class="primaryline">${c.name}</div><div class="subline">${c.tier}</div>`;
+}
+function shipOf(id){ return SHIPMENTS.find(s=>s.id===id); }
+function wireUp(){ /* hook for post-render wiring per view */ if(window._wire){window._wire(); window._wire=null;} }
+
+const VIEWS = {};
+function restrictedView(title){
+  return `<div class="viewhead"><div><h1>${title}</h1></div></div>
+  <div class="card"><div class="emptystate"><div class="big">This area is managed by Backhaul Direct</div>
+  Carrier identity, procurement and internal cost detail live inside BHD's restricted operations view.<br>
+  Your portal shows capacity by status on every load: Qualified Provider · Primary Capacity · Backup Capacity · Carrier Confirmed.</div></div>`;
+}
+</script>
+<script>
+/* =====================================================
+   VIEW: EXECUTIVE COMMAND CENTER
+   ===================================================== */
+VIEWS.dashboard = function(){
+  const cust = isCust();
+  const active = SHIPMENTS.filter(s=>!['Closed'].includes(s.status)).length;
+  const needsAction = SHIPMENTS.filter(s=>['Intake — Data Gaps','Planning','Permit Delay','Tendered — Awaiting Accept','Delivered — Exception'].includes(s.status)).length;
+  const openEx = EXCEPTIONS.filter(e=>e.status.startsWith('Open')).length;
+
+  const kpis = [
+    {l:'Active loads', v:active, m:'Jane Lew pilot network', sig:'n'},
+    {l:'Loads requiring action', v:needsAction, m:'Across intake, planning, tender, claims', sig: needsAction>3?'r':'a'},
+    {l:'Tender acceptance', v:'93%', m:'Rolling 30 days', sig:'g', d:'+2 pts', up:true},
+    {l:'Equipment confirmed', v:'100%', m:'Of tendered loads', sig:'g'},
+    {l:'On-time pickup', v:'96%', m:'Target 95% · rolling 30d', sig:'g', d:'+1 pt', up:true},
+    {l:'On-time delivery', v:'91%', m:'Target 93% · rolling 30d', sig:'a', d:'-2 pts', up:false},
+    {l:'Tracking compliance', v:'95%', m:'Target 95%', sig:'g'},
+    {l:'Open exceptions', v:openEx, m:'Oldest 2.8 days · SLA met on all', sig: openEx>4?'r':'a'},
+    {l:'Claims (STD)', v:'1', m:'Cosmetic · $ TBD · in review', sig:'a'},
+    {l:cust?'Program spend (MTD)':'Customer spend (MTD)', v:'$24.9K', m:'8 billable loads · Sep', sig:'n'},
+    {l:'Avoided cost (STD)', v:'$6.1K', m:'Consolidation + retender + audit catches', sig:'g'},
+    {l:'Data completeness', v:'92%', m:'First-pass intake, rolling 30d', sig:'a', d:'+5 pts', up:true}
+  ];
+
+  const period = `<div class="filterbar" role="group" aria-label="Reporting period">
+    ${['7 days','30 days','90 days','Season to date','Year to date'].map((p,i)=>`<button class="chip ${i===1?'on':''}" onclick="toast('Period switched to ${p} (demo)')">${p}</button>`).join('')}
+  </div>`;
+
+  const actionRows = SHIPMENTS.filter(s=>['Intake — Data Gaps','Planning','Permit Delay','Tendered — Awaiting Accept','Delivered — Exception','Ready to Tender'].includes(s.status))
+    .map(s=>`<tr class="clickable" onclick="go('detail','${s.id}')">
+      <td><div class="primaryline">${s.id}</div><div class="subline">${s.po}</div></td>
+      <td><div class="primaryline">${s.lane}</div><div class="subline">${s.product}</div></td>
+      <td>${statusBadge(s.status)}</td>
+      <td>${riskBadge(s.risk)}</td>
+      <td><div class="subline" style="font-size:.8rem;color:var(--ink)">${s.milestone}</div></td>
+    </tr>`).join('');
+
+  const plantRows = PLANTS.map(p=>`<tr>
+    <td><div class="primaryline">${p.name}</div><div class="subline">${p.loadsPerDay} loads/day</div></td>
+    <td>${p.id==='JLW'?'<span class="badge g">Live — Pilot</span>':p.status==='Planned'?'<span class="badge n">Planned</span>':'<span class="badge a">Gated</span>'}</td>
+    <td>${p.id==='JLW'?'OTP 96% · OTD 91% · Track 95%':'—'}</td>
+    <td><div class="subline" style="color:var(--ink)">${p.gate}</div></td>
+  </tr>`).join('');
+
+  const laneScore = [
+    ['JLW → Columbus, OH', 97, 'g'],
+    ['JLW → Pittsburgh, PA', 96, 'g'],
+    ['JLW → Richmond, VA', 94, 'g'],
+    ['JLW → Louisville, KY', 92, 'a'],
+    ['JLW → Charlotte, NC', 88, 'a'],
+    ['JLW → Atlanta, GA', 81, 'r']
+  ].map(([lane,score,c])=>`<div class="scorebarrow"><span>${lane}</span><div class="bar"><i style="width:${score}%;background:var(--${c==='g'?'green':c==='a'?'amber':'red'})"></i></div><b class="money">${score}</b></div>`).join('');
+
+  return `
+  <div class="viewhead">
+    <div><h1>${cust?'Latham Program Command Center':'Executive Command Center'}</h1>
+    <div class="sub">${cust?'Live service, cost, risk and exception performance across your fiberglass transportation program, managed end-to-end by Backhaul Direct.':'Portfolio view of the Latham fiberglass program — service, cost, risk, exceptions, billing and rollout readiness.'}</div></div>
+    <div class="actions">
+      <button class="btn" onclick="go('reports')">Open scorecards</button>
+      <button class="btn primary" onclick="go('intake')">New shipment request</button>
+    </div>
+  </div>
+  ${period}
+  <div class="grid cols-4" style="margin-bottom:14px">
+    ${kpis.map(k=>`<div class="kpi"><span class="sig ${k.sig}" aria-hidden="true"></span><div class="lbl">${k.l}</div><div class="val">${k.v}${k.d?`<span class="delta ${k.up?'up':'down'}">${k.d}</span>`:''}</div><div class="meta">${k.m}</div></div>`).join('')}
+  </div>
+  <div class="split">
+    <div class="card">
+      <div class="cardhead"><h2>Loads requiring action</h2><span class="hint">Sorted by risk</span>
+        <div class="right"><button class="btn sm" onclick="go('board')">Full board</button></div></div>
+      <div class="cardbody flush tablewrap">
+        <table class="data"><thead><tr><th>Load</th><th>Lane / Product</th><th>Status</th><th>Risk</th><th>Current step</th></tr></thead>
+        <tbody>${actionRows}</tbody></table>
+      </div>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="card">
+        <div class="cardhead"><h2>Peak-capacity readiness</h2></div>
+        <div class="cardbody">
+          <dl class="kv">
+            <dt>Primary coverage — JLW lanes</dt><dd>7 of 7 lanes</dd>
+            <dt>Backup coverage — JLW lanes</dt><dd>6 of 7 lanes</dd>
+            <dt>${cust?'Qualified providers staged':'Qualified carriers staged'}</dt><dd>${cust?'Sufficient for 2× current volume':'5 qualified · 1 in qualification'}</dd>
+            <dt>Escort network</dt><dd>WV / VA / NC covered</dd>
+            <dt>Seasonal surge plan</dt><dd><span class="badge a">Draft — due Sep 20</span></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="card">
+        <div class="cardhead"><h2>Lane scorecards</h2><span class="hint">Composite service score</span></div>
+        <div class="cardbody">${laneScore}</div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="cardhead"><h2>Plant rollout</h2><span class="hint">Phased network expansion with formal go/no-go gates</span></div>
+    <div class="cardbody flush"><table class="data"><thead><tr><th>Plant</th><th>Status</th><th>Service (30d)</th><th>Gate</th></tr></thead><tbody>${plantRows}</tbody></table></div>
+  </div>`;
+};
+
+/* =====================================================
+   VIEW: LIVE SHIPMENT BOARD
+   ===================================================== */
+VIEWS.board = function(){
+  const rows = SHIPMENTS.map(s=>`<tr class="clickable" onclick="go('detail','${s.id}')">
+    <td><div class="primaryline">${s.id}</div><div class="subline">${s.po}</div></td>
+    <td>Jane Lew, WV</td>
+    <td><div class="primaryline">${s.dest.split(' — ')[1]||s.dest}</div><div class="subline">${s.dest.split(' — ')[0]}</div></td>
+    <td><div>${s.pickup}</div><div class="subline">Del: ${s.delivery}</div></td>
+    <td><div>${s.equip}</div><div class="subline">${s.service}</div></td>
+    <td>${s.readiness===100?'<span class="badge g">Ready</span>':`<span class="badge ${s.readiness>=80?'a':'r'}">${s.readiness}%</span>`}</td>
+    <td>${carrierCell(s)}</td>
+    <td>${statusBadge(s.status)}</td>
+    <td>${s.track&&s.track!=='—'?`<span class="badge g">On</span><div class="subline">${s.track}</div>`:'<span class="badge n">—</span>'}</td>
+    <td>${s.od?`<span class="badge v">OD</span><div class="subline">${s.permits.join(' · ')}</div>`:'<span class="badge n">Legal</span>'}</td>
+    <td>${riskBadge(s.risk)}</td>
+    <td>${s.exceptions.length?`<span class="badge r">${s.exceptions.length} open</span>`:'<span class="badge n">None</span>'}</td>
+  </tr>`).join('');
+
+  return `
+  <div class="viewhead">
+    <div><h1>Live Shipment Board</h1><div class="sub">Every program load from request through closeout. Click a row for the full shipment record.</div></div>
+    <div class="actions">
+      <button class="btn" onclick="toast('Calendar view (demo)')">Calendar</button>
+      <button class="btn" onclick="toast('Kanban view (demo)')">Board</button>
+      <button class="btn primary" onclick="go('intake')">New request</button>
+    </div>
+  </div>
+  <div class="filterbar">
+    <input type="search" placeholder="Search load, PO, dealer, city…" id="boardSearch" oninput="filterBoard()">
+    <select id="fPlant" onchange="filterBoard()"><option value="">All plants</option><option>Jane Lew, WV</option></select>
+    <select id="fStatus" onchange="filterBoard()"><option value="">All statuses</option>${[...new Set(SHIPMENTS.map(s=>s.status))].map(s=>`<option>${s}</option>`).join('')}</select>
+    <select id="fRisk" onchange="filterBoard()"><option value="">All risk</option><option value="g">Low</option><option value="a">Watch</option><option value="r">High</option></select>
+    <button class="chip" onclick="toast('Saved filter applied (demo)')">My open exceptions</button>
+    <button class="chip" onclick="toast('Saved filter applied (demo)')">Pickups next 48h</button>
+  </div>
+  <div class="card"><div class="cardbody flush tablewrap">
+    <table class="data" id="boardTable"><thead><tr>
+      <th>Load</th><th>Origin</th><th>Destination</th><th>Windows</th><th>Equipment</th><th>Readiness</th>
+      <th>${isCust()?'Assigned capacity':'Carrier'}</th><th>Status</th><th>Tracking</th><th>Permits</th><th>Risk</th><th>Exceptions</th>
+    </tr></thead><tbody>${rows}</tbody></table>
+  </div></div>`;
+};
+function filterBoard(){
+  const q=(document.getElementById('boardSearch').value||'').toLowerCase();
+  const st=document.getElementById('fStatus').value;
+  const rk=document.getElementById('fRisk').value;
+  document.querySelectorAll('#boardTable tbody tr').forEach((tr,i)=>{
+    const s=SHIPMENTS[i];
+    let ok=true;
+    if(q && !(s.id+s.po+s.dest+s.lane).toLowerCase().includes(q)) ok=false;
+    if(st && s.status!==st) ok=false;
+    if(rk && s.risk!==rk) ok=false;
+    tr.style.display=ok?'':'none';
+  });
+}
+</script>
+<script>
+/* =====================================================
+   VIEW: LOAD DETAIL
+   ===================================================== */
+const MILESTONES = ['Shipment requested','Data validated','Planning complete','Customer rate approved','Capacity confirmed','Tender accepted','Equipment confirmed','Permits secured','Pickup appointment confirmed','Arrived at origin','Loaded','Departed','In transit','Arrived at destination','Unloaded','Proof of delivery received','Costs reconciled','Customer billed','Carrier paid','Shipment closed'];
+const MILESTONE_PROGRESS = {
+  'Intake — Data Gaps':1,'Planning':2,'Ready to Tender':5,'Tendered — Awaiting Accept':5,'Permit Delay':7,
+  'Tender Accepted':9,'In Transit':13,'Delivered':16,'Delivered — Exception':16,'Closed':20
+};
+
+VIEWS.detail = function(){
+  const s = shipOf(ROUTE_ARG) || SHIPMENTS[0];
+  const prog = MILESTONE_PROGRESS[s.status] ?? 3;
+  const times = ['Sep 6, 09:12','Sep 6, 11:40','Sep 7, 08:15','Sep 7, 09:02','Sep 7, 10:30','Sep 7, 10:44','Sep 7, 15:20','Sep 8, 06:10','Sep 8, 06:30','Sep 8, 06:58','Sep 8, 07:35','Sep 8, 07:41','Sep 8, 07:41','','','','','','',''];
+  const tl = MILESTONES.map((m,i)=>{
+    const cls = i<prog?'done':(i===prog?'now':'pending');
+    return `<li class="${cls}"><span class="node" aria-hidden="true"></span><div><div class="mt">${m}</div>${i===prog?'<div class="ms">Current step</div>':''}</div><span class="mtime">${i<prog?(times[i]||'✓'):''}</span></li>`;
+  }).join('');
+
+  const c = s.carrierId ? CARRIERS.find(c=>c.id===s.carrierId) : null;
+  const pass = s.passThrough.permits + s.passThrough.escorts + s.passThrough.tolls;
+
+  const costCard = seeBuy() ? `
+    <div class="card"><div class="cardhead"><h2>Cost & margin</h2><span class="badge internal">BHD internal</span></div>
+    <div class="cardbody"><table class="minitable">
+      <tr><td>Approved customer charge (all-in)</td><td>${$money(s.customerRate)}</td></tr>
+      <tr><td>Carrier linehaul buy</td><td>${$money(s.carrierBuy)}</td></tr>
+      <tr><td>Permits (pass-through)</td><td>${$money(s.passThrough.permits)}</td></tr>
+      <tr><td>Escorts / pilot cars (pass-through)</td><td>${$money(s.passThrough.escorts)}</td></tr>
+      <tr><td>Tolls (pass-through)</td><td>${$money(s.passThrough.tolls)}</td></tr>
+      ${s.customerRate?`<tr class="total"><td>Expected BHD gross profit</td><td>${$money(s.customerRate - s.carrierBuy - pass)} · ${Math.round((s.customerRate-s.carrierBuy-pass)/s.customerRate*100)}%</td></tr>`:''}
+    </table>
+    <div class="notice internal" style="margin-top:10px">No commission is calculated on pass-through items (permits, escorts, pilot cars, tolls, quick-pay) or on incumbent/inherited volume. Funding status: <b>${s.funding}</b>.</div>
+    </div>` : `
+    <div class="card"><div class="cardhead"><h2>Approved program cost</h2></div>
+    <div class="cardbody"><table class="minitable">
+      <tr><td>All-in approved charge</td><td>${$money(s.customerRate)}</td></tr>
+      <tr><td>Includes</td><td style="font-weight:500;text-align:right">Linehaul · fuel · permits · escorts · tolls</td></tr>
+      <tr><td>Billing status</td><td style="text-align:right">${s.billing}</td></tr>
+    </table>
+    <div class="notice info" style="margin-top:10px">This program is priced on approved all-in rates. Itemized pass-through backup (permits, escorts, tolls, approved accessorials) is attached to your invoice.</div>
+    </div>`;
+
+  const capacityCard = seeCarrier() ? `
+    <div class="card"><div class="cardhead"><h2>Assigned capacity</h2><span class="badge internal">BHD internal</span></div>
+    <div class="cardbody">${c?`
+      <dl class="kv">
+        <dt>Carrier</dt><dd>${c.name}</dd>
+        <dt>MC / DOT</dt><dd>${c.mc} · ${c.dot}</dd>
+        <dt>Dispatcher</dt><dd>${c.contact} · ${c.phone}</dd>
+        <dt>Role on lane</dt><dd>${c.tier}</dd>
+        <dt>Insurance</dt><dd>${c.insurance}</dd>
+        <dt>Tracking</dt><dd>${s.track}</dd>
+      </dl>`:`<div class="emptystate"><div class="big">No carrier assigned yet</div>Capacity will be assigned from the qualified network in Tender Management.</div>`}
+    </div></div>` : `
+    <div class="card"><div class="cardhead"><h2>Assigned capacity</h2></div>
+    <div class="cardbody">
+      <dl class="kv">
+        <dt>Capacity status</dt><dd>${capacityLabel(s)}</dd>
+        <dt>Provider standing</dt><dd>${c?'Qualified Provider — vetted for over-dimensional fiberglass':'Sourcing from qualified network'}</dd>
+        <dt>Equipment</dt><dd>${s.equip}</dd>
+        <dt>Tracking</dt><dd>${s.track && s.track!=='—' ? 'Active — live milestones below' : 'Activates at tender acceptance'}</dd>
+      </dl>
+      <div class="notice info" style="margin-top:10px">Backhaul Direct is your single accountable provider. Carrier sourcing, qualification, negotiation and payment are managed by BHD inside this program.</div>
+    </div></div>`;
+
+  const comms = (COMMS[s.id]||[]).filter(m=>!m.internal || !isCust());
+  const commHtml = comms.length ? comms.map(m=>`<div class="commrow ${m.internal?'internalnote':''}">
+      <span class="who">${m.who}${m.internal?' <span class="badge internal">Internal note</span>':''}<span class="when">${m.when}</span></span>
+      <div class="msg">${m.msg}</div></div>`).join('')
+    : `<div class="emptystate"><div class="big">No messages yet</div>Questions about this shipment stay on the load record — start the thread below.</div>`;
+
+  return `
+  <div class="viewhead">
+    <div><h1>${s.id} <span style="font-weight:400;color:var(--ink-3);font-size:1rem">· ${s.lane}</span></h1>
+    <div class="sub">${s.product} · ${s.dims} · ${s.weight} · ${s.miles} mi ${s.od?'· Over-dimensional':''}</div></div>
+    <div class="actions">
+      ${statusBadge(s.status)} ${riskBadge(s.risk)}
+      <button class="btn" onclick="go('board')">Back to board</button>
+      ${!isCust()&&!readOnly()?`<button class="btn primary" onclick="go('planning')">Open in planning</button>`:''}
+    </div>
+  </div>
+  ${s.exceptions.length?`<div class="notice danger" style="margin-bottom:14px"><b>${s.exceptions.length} open exception:</b> ${EXCEPTIONS.filter(e=>s.exceptions.includes(e.id)).map(e=>`${e.id} — ${e.type} (${e.status})`).join(' · ')} &nbsp;<a href="#" onclick="go('exceptions');return false;">Open Exception Center</a></div>`:''}
+  <div class="split">
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="card"><div class="cardhead"><h2>Shipment record</h2></div>
+      <div class="cardbody"><div class="grid cols-2">
+        <dl class="kv">
+          <dt>Plant / origin</dt><dd>Jane Lew, WV — Latham Fiberglass</dd>
+          <dt>Consignee</dt><dd>${s.dest}</dd>
+          <dt>Pickup window</dt><dd>${s.pickup} · ${s.apptOrigin}</dd>
+          <dt>Delivery window</dt><dd>${s.delivery} · ${s.apptDest}</dd>
+          <dt>Service level</dt><dd>${s.service}</dd>
+          <dt>References</dt><dd>${s.po}</dd>
+        </dl>
+        <dl class="kv">
+          <dt>Equipment</dt><dd>${s.equip}</dd>
+          <dt>Permits</dt><dd>${s.permits.join(' · ')}</dd>
+          <dt>Escorts</dt><dd>${s.escorts}</dd>
+          <dt>Loading</dt><dd>Plant overhead crane</dd>
+          <dt>Unloading</dt><dd>Dealer crane on site</dd>
+          <dt>Stackability</dt><dd>Nested pair where noted; no top load</dd>
+        </dl>
+      </div></div></div>
+      ${costCard}
+      <div class="card"><div class="cardhead"><h2>Communication — this load</h2><span class="hint">Customer thread ${isCust()?'':'+ internal notes'}</span></div>
+        <div class="cardbody flush">${commHtml}
+        <div style="padding:12px;display:flex;gap:8px;border-top:1px solid var(--line-2)">
+          <input type="text" placeholder="Message the ${isCust()?'BHD team':'customer thread'} about ${s.id}…" style="flex:1;border:1px solid var(--line);border-radius:6px;padding:8px 10px" ${readOnly()?'disabled':''}>
+          <button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('Message posted to load thread (demo)')">Send</button>
+          ${!isCust()&&!readOnly()?`<button class="btn" onclick="toast('Internal note added (never visible to customer roles)')">Internal note</button>`:''}
+        </div></div>
+      </div>
+      <div class="card"><div class="cardhead"><h2>Documents</h2><span class="hint">${isCust()?'Customer-visible documents':'Full document set (visibility controlled by type + role)'}</span></div>
+        <div class="cardbody"><div class="pillrow">
+          ${s.docs.map(d=>`<button class="btn sm" onclick="toast('Opening ${d} (demo)')">${d}</button>`).join('')}
+          ${!isCust()?`<button class="btn sm" style="border-style:dashed" onclick="toast('Rate confirmation + carrier invoice are internal-only document types')">🔒 Carrier docs (internal)</button>`:''}
+        </div>
+        ${isCust()?'<div class="notice info" style="margin-top:10px">Documents that identify carriers or contain BHD procurement detail are maintained by Backhaul Direct and are not part of the customer document set.</div>':''}
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      ${capacityCard}
+      <div class="card"><div class="cardhead"><h2>Milestones & audit trail</h2></div>
+        <div class="cardbody"><ul class="timeline">${tl}</ul>
+        <div class="notice internal" style="margin-top:6px">Every milestone, edit, approval and override on this load is timestamped with the acting user. ${ROLE==='auditor'?'<b>Auditor access to this record has been logged.</b>':''}</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+};
+
+/* =====================================================
+   VIEW: SHIPMENT INTAKE
+   ===================================================== */
+VIEWS.intake = function(){
+  window._wire = () => {};
+  const f=(label,req,type,ph,note,invalid)=>`
+    <div class="field ${invalid?'invalid':''}"><label>${label} ${req?'<span class="req">*</span>':''}</label>
+    ${type==='select'?`<select ${readOnly()?'disabled':''}><option value="">Select…</option>${ph.map(o=>`<option>${o}</option>`).join('')}</select>`
+      :type==='area'?`<textarea rows="3" placeholder="${ph}" ${readOnly()?'disabled':''}></textarea>`
+      :`<input type="${type}" placeholder="${ph||''}" ${readOnly()?'disabled':''}>`}
+    ${note?`<div class="fieldnote">${note}</div>`:''}</div>`;
+
+  return `
+  <div class="viewhead">
+    <div><h1>New Shipment Request</h1>
+    <div class="sub">Guided intake for the Jane Lew program. Missing or conflicting fields are flagged here — a request cannot enter planning until validation passes, and cannot tender until every readiness gate is complete.</div></div>
+    <div class="actions"><button class="btn" onclick="toast('Draft saved (demo)')">Save draft</button></div>
+  </div>
+  <div class="notice warn" style="margin-bottom:14px"><b>2 items need attention before this request can enter planning:</b> unloading method is required for dealer destinations, and the entered width (13'6") conflicts with the selected "no permits required" flag.</div>
+  <div class="card"><div class="cardbody"><div class="formgrid">
+    <div class="sectiondivider">Origin & destination</div>
+    ${f('Plant / origin',1,'select',['Jane Lew, WV — Latham Fiberglass'])}
+    ${f('Dealer / consignee',1,'text','e.g., Splash Pools of Richmond')}
+    ${f('Delivery address',1,'text','Street, city, state, ZIP')}
+    ${f('Consignee contact',1,'text','Name · phone · email')}
+    ${f('Customer reference / PO',1,'text','LTH-PO-…')}
+    ${f('Requested service level',1,'select',['Standard OD','Expedited OD','Scheduled program run'])}
+    <div class="sectiondivider">Timing</div>
+    ${f('Pickup date & window',1,'text','Sep 12, 07:00–09:00')}
+    ${f('Requested delivery date & window',1,'text','Sep 13, 08:00–12:00')}
+    ${f('Appointment requirements',0,'select',['No appointment','Delivery appointment required','Call ahead 24h'])}
+    <div class="sectiondivider">Product & handling</div>
+    ${f('Product type',1,'select',['Fiberglass pool shell','Shell + spa combo','Shell pair (nested)','Tanning ledge / accessories'])}
+    ${f('Unit count',1,'number','1')}
+    ${f('Exact dimensions (L × W × H)',1,'text','e.g., 35\'10" × 13\'6" × 6\'2"','Measured, not catalog — drives permit classification')}
+    ${f('Weight',1,'text','e.g., 6,900 lb')}
+    ${f('Stackability',1,'select',['Not stackable','Nested pair approved','Per engineering note'])}
+    ${f('Loading method',1,'select',['Plant overhead crane','Forklift + spreader bar','Carrier-provided'])}
+    ${f('Unloading method',1,'select',['Dealer crane on site','Crane service (arranged by dealer)','Homeowner site crane — details required'],'Required for dealer and residential destinations',true)}
+    <div class="sectiondivider">Equipment & route</div>
+    ${f('Trailer / equipment requirement',1,'select',['Step Deck 48\'','Step Deck 53\'','Extendable step deck','RGN'])}
+    ${f('Over-dimensional?',1,'select',['Yes — width over 8\'6"','No — legal load'],'Width 13\'6" entered above conflicts with "No" — please correct',true)}
+    ${f('Route restrictions',0,'area','Low bridges, HOA access limits, jobsite constraints…')}
+    ${f('Permit requirements',0,'text','Auto-classified in planning; note known constraints')}
+    ${f('Escort / pilot-car requirements',0,'text','Auto-classified by state; note site escorts if any')}
+    ${f('Site restrictions',0,'area','Gate codes, delivery hours, overhead lines…')}
+    <div class="sectiondivider">Attachments & instructions</div>
+    ${f('Photos or drawings',0,'text','Attach shell drawings / site photos (demo)')}
+    ${f('Required documents',0,'select',['Standard set (BOL + POD)','Standard + delivery photos','Custom'])}
+    ${f('Special instructions',0,'area','Anything the driver or planner must know')}
+  </div>
+  <div style="display:flex;gap:8px;margin-top:16px;align-items:center">
+    <button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('Validation failed: 2 required items flagged above (demo)')">Validate & submit to planning</button>
+    <button class="btn" onclick="toast('Draft saved (demo)')">Save draft</button>
+    <span class="hint" style="color:var(--ink-3);font-size:.76rem">Submitting starts the readiness checklist — see Tender Management for gate status.</span>
+  </div>
+  </div></div>`;
+};
+</script>
+<script>
+/* =====================================================
+   VIEW: TENDER MANAGEMENT (with mandatory gate)
+   ===================================================== */
+VIEWS.tender = function(){
+  if(isCust()) return restrictedView('Tender Management');
+  const gates = [
+    ['Dimensions & weight documented','Measured dims on file; matches drawing','done'],
+    ['Stacking & trailer requirements','Nested pair · Step Deck 48\'','done'],
+    ['Dealer / consignee contact verified','Great Escapes Pools · confirmed by phone','done'],
+    ['Route & permit classification','WV + PA annual OD; under escort thresholds','done'],
+    ['Escort / pilot-car plan','Not required on this routing','done'],
+    ['Approved all-in carrier buy', seeBuy()? '$1,560 linehaul approved within threshold':'Approved within threshold','done'],
+    ['Qualified capacity identified', seeCarrier()? 'Primary: Mountaineer · Backup: Appalachian':'Primary + backup assigned','done'],
+    ['Plant pickup appointment','Sep 9, 08:00 confirmed with JLW shipping','done'],
+    ['Delivery appointment / receiving','Sep 9, 14:30 confirmed with dealer','done'],
+    ['Tracking method assigned','Carrier ELD + app link','done'],
+    ['Communication & escalation chain','Plant + dealer + BHD on-call attached','done'],
+    ['Approved customer charge','$1,980 contract rate card','done'],
+    ['Carrier-payment funding status','Funded — customer terms current','done']
+  ];
+  const gates1049 = [
+    ['Dimensions & weight documented','On file','done'],
+    ['Dealer / consignee contact verified','Missing phone — EX-2204','open'],
+    ['Delivery appointment / receiving','Requirements not provided','open'],
+    ['Route & permit classification','WV + MD classified','done'],
+    ['Approved customer charge','Spot quote pending data','warn'],
+    ['Carrier-payment funding status','Blocked until charge approved','warn']
+  ];
+  const gRow = g=>`<div class="gate ${g[2]}"><span class="tick">${g[2]==='done'?'✓':g[2]==='warn'?'!':'✕'}</span><div><div class="gt">${g[0]}</div><div class="gs">${g[1]}</div></div></div>`;
+
+  return `
+  <div class="viewhead">
+    <div><h1>Tender Management</h1><div class="sub">Structured tendering against the qualified network. A load cannot be tendered until every readiness gate is complete — only a documented executive override can bypass the gate.</div></div>
+  </div>
+  <div class="grid cols-2">
+    <div class="card">
+      <div class="cardhead"><h2>BHD-26-1044 · JLW → Pittsburgh, PA</h2><div class="right"><span class="badge g">Ready to tender</span></div></div>
+      <div class="cardbody">
+        <div class="gatebanner ready">✓ All 13 readiness gates complete. Tender window opens 13:00.</div>
+        <div class="card" style="box-shadow:none">${gates.map(gRow).join('')}</div>
+        <div style="margin-top:12px">
+          <div class="sectiondivider" style="border:0;padding:0;margin-bottom:8px">Tender sequence</div>
+          <table class="minitable">
+            <tr><td>1. Primary — ${seeCarrier()?'Mountaineer Specialized (C-101)':'Primary Capacity'}</td><td>Deadline 15:00 · auto-retender on reject</td></tr>
+            <tr><td>2. Backup — ${seeCarrier()?'Appalachian Wide Load (C-102)':'Backup Capacity'}</td><td>Deadline 17:00</td></tr>
+            <tr><td>3. Emergency sourcing</td><td>Capacity desk manual — reason code required</td></tr>
+          </table>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('Tender released to primary capacity — deadline 15:00 (demo)')">Release tender</button>
+          <button class="btn" onclick="toast('Tender history opened (demo)')">Tender history</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cardhead"><h2>BHD-26-1049 · JLW → Annapolis, MD</h2><div class="right"><span class="badge r">Blocked</span></div></div>
+      <div class="cardbody">
+        <div class="gatebanner blocked">✕ Tendering blocked — 2 gates open, 2 at risk. Expedited pickup in 72h.</div>
+        <div class="card" style="box-shadow:none">${gates1049.map(gRow).join('')}</div>
+        <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
+          <button class="btn" disabled>Release tender</button>
+          <button class="btn danger" ${readOnly()?'disabled':''} onclick="openOverride('BHD-26-1049')">Executive override…</button>
+          <span style="font-size:.74rem;color:var(--ink-3)">Overrides require executive approval, a reason code, and are written to the audit trail.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="cardhead"><h2>Open tenders & recent activity</h2></div>
+    <div class="cardbody flush"><table class="data"><thead><tr><th>Load</th><th>${isCust()?'Capacity':'Carrier'}</th><th>Sent</th><th>Deadline</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+      <tr class="clickable" onclick="go('detail','BHD-26-1048')"><td class="primaryline">BHD-26-1048</td><td>${seeCarrier()?'Mountaineer Specialized':'Primary Capacity'}</td><td>Today 11:05</td><td>Today 15:00</td><td><span class="badge a">Awaiting accept</span></td><td>Auto-retender to backup at deadline</td></tr>
+      <tr class="clickable" onclick="go('detail','BHD-26-1042')"><td class="primaryline">BHD-26-1042</td><td>${seeCarrier()?'Mountaineer Specialized':'Primary Capacity'}</td><td>Sep 7, 10:30</td><td>—</td><td><span class="badge g">Accepted 10:44</span></td><td>Equipment confirmed same day</td></tr>
+      <tr class="clickable" onclick="go('detail','BHD-26-1043')"><td class="primaryline">BHD-26-1043</td><td>${seeCarrier()?'Blue Ridge Pool Carriers':'Primary Capacity'}</td><td>Sep 7, 09:15</td><td>—</td><td><span class="badge g">Accepted 09:22</span></td><td>Holding equipment through permit review</td></tr>
+      <tr><td class="primaryline">BHD-26-1038</td><td>${seeCarrier()?'Tri-State Flatbed':'Alternate Capacity'}</td><td>Sep 4, 08:10</td><td>—</td><td><span class="badge r">Rejected</span></td><td>Reason: no driver — retendered to backup in 12 min</td></tr>
+    </tbody></table></div>
+  </div>`;
+};
+function openOverride(id){
+  openModal(`<div class="cardhead"><h2>Executive override — ${id}</h2></div>
+  <div class="cardbody">
+    <div class="notice danger" style="margin-bottom:12px">This bypasses the mandatory tender gate. The override, approver, reason and open gates are permanently recorded in the audit trail and surfaced on the executive dashboard.</div>
+    <div class="field" style="margin-bottom:10px"><label>Approving executive <span class="req">*</span></label><select><option value="">Select…</option><option>G. Harris — BHD Executive</option></select></div>
+    <div class="field" style="margin-bottom:10px"><label>Reason code <span class="req">*</span></label><select><option value="">Select…</option><option>Customer-directed emergency</option><option>Service recovery</option><option>Documented commercial exception</option></select></div>
+    <div class="field" style="margin-bottom:14px"><label>Justification <span class="req">*</span></label><textarea rows="3" placeholder="Required — becomes part of the permanent record"></textarea></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn danger" onclick="closeModal();toast('Override recorded to audit trail (demo)')">Record override</button></div>
+  </div>`);
+}
+
+/* =====================================================
+   VIEW: PLANNING WORKSPACE
+   ===================================================== */
+VIEWS.planning = function(){
+  if(isCust()) return restrictedView('Planning Workspace');
+  const s = shipOf('BHD-26-1045');
+  return `
+  <div class="viewhead">
+    <div><h1>Planning Workspace</h1><div class="sub">Route, permit, escort, cost and capacity planning before a load can reach the tender gate.</div></div>
+    <div class="actions"><select onchange="toast('Load switched (demo)')" style="border:1px solid var(--line);border-radius:6px;padding:6px 9px"><option>BHD-26-1045 · JLW → Knoxville, TN</option><option>BHD-26-1049 · JLW → Annapolis, MD</option></select></div>
+  </div>
+  <div class="notice warn" style="margin-bottom:14px"><b>Planning alerts:</b> TN mountain segment (I-40 Rockwood grade) requires chase escort · residential-adjacent delivery — unloading method still unconfirmed (EX-2203) · lead time is 2 days against a 3-day permit norm for this routing.</div>
+  <div class="split">
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="card"><div class="cardhead"><h2>Route & permit plan</h2></div>
+        <div class="cardbody">
+          <div style="border:1px solid var(--line);border-radius:6px;background:linear-gradient(135deg,#eef3f9,#f7fafd);padding:0;height:190px;position:relative;overflow:hidden" role="img" aria-label="Route map placeholder">
+            <svg viewBox="0 0 600 190" style="width:100%;height:100%">
+              <path d="M60,40 C180,60 260,80 340,120 C420,158 480,150 545,140" fill="none" stroke="#2563a8" stroke-width="3" stroke-dasharray="1 0"/>
+              <circle cx="60" cy="40" r="7" fill="#1e7a4c"/><text x="72" y="36" font-size="12" fill="#1c2733" font-weight="600">Jane Lew, WV</text>
+              <circle cx="340" cy="120" r="5" fill="#9a6a06"/><text x="350" y="114" font-size="11" fill="#9a6a06">I-40 Rockwood grade — escort segment</text>
+              <circle cx="545" cy="140" r="7" fill="#b23330"/><text x="440" y="168" font-size="12" fill="#1c2733" font-weight="600">Knoxville, TN</text>
+            </svg>
+          </div>
+          <div class="grid cols-2" style="margin-top:12px">
+            <dl class="kv">
+              <dt>Mileage</dt><dd>356 practical OD miles</dd>
+              <dt>Permit jurisdictions</dt><dd>WV · VA · TN</dd>
+              <dt>Permit lead time</dt><dd>WV same-day · VA 1 day · TN 2 days</dd>
+              <dt>Escorts</dt><dd>Chase — TN mountain segment only</dd>
+            </dl>
+            <dl class="kv">
+              <dt>Toll exposure</dt><dd>$0–18 (routing dependent)</dd>
+              <dt>Travel restrictions</dt><dd>Daylight only · no Sun AM (TN)</dd>
+              <dt>Risk score</dt><dd><span class="badge a">62 / 100 — Watch</span></dd>
+              <dt>Comparable history</dt><dd>2 prior loads · both on-time</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="card"><div class="cardhead"><h2>Comparable shipment history — this lane</h2></div>
+        <div class="cardbody flush"><table class="data"><thead><tr><th>Load</th><th>Date</th><th>Equipment</th>${seeBuy()?'<th class="num">Buy</th><th class="num">Charge</th>':''}<th>Outcome</th></tr></thead><tbody>
+          <tr><td>BHD-26-0961</td><td>Jul 14</td><td>Step Deck 53'</td>${seeBuy()?'<td class="num">$2,880</td><td class="num">$3,590</td>':''}<td><span class="badge g">On-time</span></td></tr>
+          <tr><td>BHD-26-0844</td><td>Jun 02</td><td>Step Deck 53'</td>${seeBuy()?'<td class="num">$2,940</td><td class="num">$3,630</td>':''}<td><span class="badge g">On-time</span></td></tr>
+        </tbody></table></div>
+      </div>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      ${seeBuy()?`<div class="card"><div class="cardhead"><h2>Cost build & approval</h2><span class="badge internal">BHD internal</span></div>
+        <div class="cardbody"><table class="minitable">
+          <tr><td>Target linehaul buy</td><td>$2,900–2,980</td></tr>
+          <tr><td>Fuel</td><td>Included (all-in buy)</td></tr>
+          <tr><td>Permits (est.)</td><td>$265</td></tr>
+          <tr><td>Escort — TN chase (est.)</td><td>$390</td></tr>
+          <tr><td>Tolls (est.)</td><td>$18</td></tr>
+          <tr class="total"><td>Proposed customer all-in</td><td>$3,640</td></tr>
+          <tr><td>Expected gross margin</td><td>~10.9%</td></tr>
+        </table>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('Sent for customer rate approval (demo)')">Send for rate approval</button>
+          <button class="btn" onclick="go('rates')">Rate card</button>
+        </div></div></div>`:''}
+      <div class="card"><div class="cardhead"><h2>Capacity plan</h2>${seeCarrier()?'<span class="badge internal">BHD internal</span>':''}</div>
+        <div class="cardbody"><dl class="kv">
+          <dt>Primary</dt><dd>${seeCarrier()?'Blue Ridge Pool Carriers':'Primary Capacity — qualified'}</dd>
+          <dt>Backup</dt><dd>${seeCarrier()?'Appalachian Wide Load':'Backup Capacity — qualified'}</dd>
+          <dt>Equipment</dt><dd>Step Deck 53' — confirmed available</dd>
+          <dt>Escort vendor</dt><dd>${seeCarrier()?'Summit Pilot & Escort':'Qualified escort network'}</dd>
+        </dl></div>
+      </div>
+      <div class="card"><div class="cardhead"><h2>Planning notes & approvals</h2></div>
+        <div class="cardbody">
+          <div class="commrow internalnote"><span class="who">R. Ostrander · Capacity <span class="when">Sep 8, 09:40</span></span><div class="msg">TN permit filed on estimate; will amend if dims change after intake completion.</div></div>
+          <div class="commrow"><span class="who">Approval status</span><div class="msg"><span class="badge a">Awaiting customer rate approval</span> → then tender gate</div></div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+};
+</script>
+<script>
+/* =====================================================
+   VIEW: EXCEPTION COMMAND CENTER
+   ===================================================== */
+VIEWS.exceptions = function(){
+  const rows = EXCEPTIONS.map(e=>`<tr class="clickable" onclick="openException('${e.id}')">
+    <td><div class="primaryline">${e.id}</div><div class="subline"><a href="#" onclick="event.stopPropagation();go('detail','${e.ship}');return false;">${e.ship}</a></div></td>
+    <td>${e.type}</td>
+    <td><span class="badge ${e.sev==='High'?'r':e.sev==='Medium'?'a':'n'}">${e.sev}</span></td>
+    <td>${isCust()? (e.owner.includes('BHD')?'BHD Operations':'BHD Operations') : e.owner}</td>
+    <td>${e.created}</td>
+    <td>${e.age}</td>
+    <td><div class="subline" style="color:var(--ink)">${e.sla}</div></td>
+    <td>${e.status.startsWith('Open')?`<span class="badge ${e.status.includes('Escalated')?'r':'a'}">${e.status}</span>`:`<span class="badge g">${e.status}</span>`}</td>
+  </tr>`).join('');
+  return `
+  <div class="viewhead">
+    <div><h1>Exception Command Center</h1><div class="sub">Every exception carries an owner, severity, SLA, root cause, corrective action and resolution. Nothing closes without a documented outcome.</div></div>
+    <div class="actions"><button class="btn" onclick="toast('Root-cause report opened (demo)')">Root-cause report</button>${!isCust()&&!readOnly()?'<button class="btn primary" onclick="toast(\'New exception form (demo)\')">Log exception</button>':''}</div>
+  </div>
+  <div class="grid cols-4" style="margin-bottom:14px">
+    <div class="kpi"><span class="sig r"></span><div class="lbl">Open</div><div class="val">4</div><div class="meta">1 high · 2 medium · 1 escalated</div></div>
+    <div class="kpi"><span class="sig g"></span><div class="lbl">SLA compliance</div><div class="val">100%</div><div class="meta">All open items inside SLA</div></div>
+    <div class="kpi"><span class="sig a"></span><div class="lbl">Oldest open</div><div class="val">2.8d</div><div class="meta">EX-2199 · claim review</div></div>
+    <div class="kpi"><span class="sig g"></span><div class="lbl">Avg. resolution (30d)</div><div class="val">1.1d</div><div class="meta">Target ≤ 2 days</div></div>
+  </div>
+  <div class="filterbar">
+    <select><option>All types</option><option>Damage</option><option>Permit Delay</option><option>Missing Data</option><option>Accessorial Request</option></select>
+    <select><option>All severities</option><option>High</option><option>Medium</option><option>Low</option></select>
+    <button class="chip on">Open only</button><button class="chip" onclick="toast('Filter (demo)')">Include closed</button>
+  </div>
+  <div class="card"><div class="cardbody flush tablewrap">
+    <table class="data"><thead><tr><th>Exception</th><th>Type</th><th>Severity</th><th>Owner</th><th>Created</th><th>Aging</th><th>SLA</th><th>Status</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+  </div></div>`;
+};
+function openException(id){
+  const e=EXCEPTIONS.find(x=>x.id===id);
+  openModal(`<div class="cardhead"><h2>${e.id} — ${e.type}</h2><div class="right"><span class="badge ${e.sev==='High'?'r':e.sev==='Medium'?'a':'n'}">${e.sev}</span></div></div>
+  <div class="cardbody">
+    <dl class="kv" style="grid-template-columns:190px 1fr">
+      <dt>Shipment</dt><dd>${e.ship}</dd>
+      <dt>Owner</dt><dd>${isCust()?'BHD Operations':e.owner}</dd>
+      <dt>Created / aging</dt><dd>${e.created} · ${e.age}</dd>
+      <dt>SLA</dt><dd>${e.sla}</dd>
+      <dt>Root cause</dt><dd>${e.root}</dd>
+      <dt>Corrective action</dt><dd>${e.action}</dd>
+      <dt>Customer communication</dt><dd>${e.comms}</dd>
+      <dt>Status</dt><dd>${e.status}</dd>
+      <dt>Resolution</dt><dd>${e.resolution}</dd>
+      <dt>Preventive action</dt><dd>${e.preventive}</dd>
+    </dl>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn" onclick="closeModal()">Close</button>
+      ${!isCust()&&!readOnly()?`<button class="btn primary" onclick="closeModal();toast('Exception update posted (demo)')">Post update</button>`:''}
+    </div>
+  </div>`);
+}
+
+/* =====================================================
+   VIEW: CARRIER NETWORK — BHD INTERNAL ONLY
+   ===================================================== */
+VIEWS.carriers = function(){
+  if(!seeCarrier()){
+    return `<div class="viewhead"><div><h1>Capacity</h1></div></div>
+    <div class="card"><div class="emptystate"><div class="big">This area is managed by Backhaul Direct</div>Carrier identity, qualification and procurement live inside BHD's restricted operations view.<br>Your program view shows capacity status on every load: Qualified Provider · Primary Capacity · Backup Capacity · Carrier Confirmed.</div></div>`;
+  }
+  const rows = CARRIERS.map(c=>`<tr class="clickable" onclick="openCarrier('${c.id}')">
+    <td><div class="primaryline">${c.name}</div><div class="subline">${c.mc} · ${c.dot} · ${c.domicile}</div></td>
+    <td>${c.equip}</td>
+    <td><div>${c.tier}</div><div class="subline">${c.incumbent?'Incumbent':'BHD-sourced'}</div></td>
+    <td>${c.status==='Qualified'||c.status==='Qualified Vendor'?'<span class="badge g">'+c.status+'</span>':c.status==='Do Not Use'?'<span class="badge r">Do Not Use</span>':'<span class="badge a">'+c.status+'</span>'}</td>
+    <td class="num">${c.tenderAcc==null?'—':c.tenderAcc+'%'}</td>
+    <td class="num">${c.otp==null?'—':c.otp+'%'}</td>
+    <td class="num">${c.otd==null?'—':c.otd+'%'}</td>
+    <td class="num">${c.trackComp==null?'—':c.trackComp+'%'}</td>
+    <td class="num">${c.claims}</td>
+    <td><div class="subline" style="color:var(--ink)">${c.insurance}</div></td>
+  </tr>`).join('');
+  return `
+  <div class="viewhead">
+    <div><h1>Carrier Network <span class="badge internal" style="vertical-align:3px">BHD internal only</span></h1>
+    <div class="sub">Sourcing, qualification, coverage depth and performance for the Latham fiberglass program. Every field on this page is excluded from customer roles, exports, notifications, documents, APIs and reports.</div></div>
+    <div class="actions"><button class="btn" onclick="toast('Sourcing pipeline (demo)')">Sourcing pipeline</button><button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('New carrier qualification packet started (demo)')">Add carrier</button></div>
+  </div>
+  <div class="notice internal" style="margin-bottom:14px"><b>Non-circumvention protection:</b> customer-facing surfaces label this network only as Qualified Provider / Primary Capacity / Backup Capacity. Access to this page is role-gated and logged.</div>
+  <div class="filterbar">
+    <input type="search" placeholder="Search name, MC, DOT, domicile…">
+    <select><option>All equipment</option><option>Step Deck</option><option>RGN</option><option>Extendable</option><option>Pilot cars</option></select>
+    <select><option>All statuses</option><option>Qualified</option><option>Conditional</option><option>In Qualification</option><option>Do Not Use</option></select>
+    <select><option>All coverage</option><option>JLW lanes</option><option>DeWitt readiness</option><option>Rockingham readiness</option></select>
+  </div>
+  <div class="card"><div class="cardbody flush tablewrap">
+    <table class="data"><thead><tr><th>Carrier</th><th>Equipment</th><th>Network role</th><th>Status</th><th class="num">Tender acc.</th><th class="num">OTP</th><th class="num">OTD</th><th class="num">Tracking</th><th class="num">Claims</th><th>Insurance</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+  </div></div>`;
+};
+function openCarrier(id){
+  const c=CARRIERS.find(x=>x.id===id);
+  openModal(`<div class="cardhead"><h2>${c.name}</h2><div class="right"><span class="badge internal">BHD internal</span></div></div>
+  <div class="cardbody">
+    <dl class="kv" style="grid-template-columns:190px 1fr">
+      <dt>Authority</dt><dd>${c.mc} · ${c.dot}</dd>
+      <dt>Domicile</dt><dd>${c.domicile}</dd>
+      <dt>Primary contact</dt><dd>${c.contact} · ${c.phone} · ${c.email}</dd>
+      <dt>Equipment</dt><dd>${c.equip}</dd>
+      <dt>OD experience</dt><dd>${c.odExp}</dd>
+      <dt>Insurance</dt><dd>${c.insurance}</dd>
+      <dt>Network role</dt><dd>${c.tier}</dd>
+      <dt>Qualification</dt><dd>${c.status}${c.status==='Do Not Use'?' — new tenders blocked by the system':''}</dd>
+      <dt>Internal notes</dt><dd style="font-weight:500">${c.notes}</dd>
+    </dl>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button class="btn" onclick="closeModal()">Close</button>
+      <button class="btn" onclick="closeModal();toast('Rate history opened (demo)')">Rate history</button>
+      <button class="btn primary" onclick="closeModal();toast('Carrier file opened (demo)')">Open full file</button>
+    </div>
+  </div>`);
+}
+
+/* =====================================================
+   VIEW: RATE & COST GOVERNANCE
+   ===================================================== */
+VIEWS.rates = function(){
+  if(isCust()) return restrictedView('Rate & Cost Governance');
+  const rows = RATECARDS.map(r=>`<tr>
+    <td class="primaryline">${r.lane}</td>
+    <td>${r.type==='Contract'?'<span class="badge b">Contract</span>':'<span class="badge a">Spot</span>'}</td>
+    <td>${r.basis}</td>
+    <td class="num money">${r.rate}</td>
+    <td>${r.expires}</td>
+    <td><div class="subline" style="color:var(--ink)">${r.history}</div></td>
+    <td class="num">${r.variance==='—'?'—':`<span class="badge ${r.variance.startsWith('+')&&parseFloat(r.variance)>1.5?'a':'g'}">${r.variance}</span>`}</td>
+  </tr>`).join('');
+  return `
+  <div class="viewhead">
+    <div><h1>Rate & Cost Governance <span class="badge internal" style="vertical-align:3px">BHD internal</span></h1>
+    <div class="sub">Approved customer rate cards, quote and buy history, cost components, approval thresholds and version control. Margin and variance alerts fire automatically.</div></div>
+    <div class="actions"><button class="btn" onclick="toast('Version history (demo)')">Version history</button><button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('Rate card editor (demo)')">Edit rate card</button></div>
+  </div>
+  <div class="grid cols-3" style="margin-bottom:14px">
+    <div class="kpi"><span class="sig g"></span><div class="lbl">Program gross margin (MTD)</div><div class="val">17.8%</div><div class="meta">Target band 15–20% on managed linehaul</div></div>
+    <div class="kpi"><span class="sig g"></span><div class="lbl">Rate vs. history variance</div><div class="val">+0.3%</div><div class="meta">Weighted, rolling 30 days</div></div>
+    <div class="kpi"><span class="sig a"></span><div class="lbl">Approvals pending</div><div class="val">2</div><div class="meta">Knoxville spot · Annapolis expedite</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="cardhead"><h2>Approved customer rate cards — Jane Lew</h2><span class="hint">All-in pricing · expires Mar 31, 2027</span></div>
+    <div class="cardbody flush"><table class="data"><thead><tr><th>Lane</th><th>Type</th><th>Basis</th><th class="num">Approved rate</th><th>Expires</th><th>History</th><th class="num">Variance</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div>
+  <div class="grid cols-2">
+    <div class="card"><div class="cardhead"><h2>Cost components & rules</h2></div>
+      <div class="cardbody"><div class="pillrow" style="margin-bottom:10px">
+        ${['Truck linehaul','Fuel surcharge','Trailer / equipment','Permits','Escorts','Pilot cars','Tolls','Accessorials','Layover','Detention','Redelivery','Storage','Quick-pay','Other approved'].map(x=>`<span class="badge n">${x}</span>`).join(' ')}
+      </div>
+      <div class="notice internal"><b>Commission rules:</b> no percentage commission on inherited volume, incumbent-carrier volume, or pass-through items (permits, escorts, pilot cars, tolls, quick-pay). Internal compensation logic never appears on customer surfaces or exports.</div>
+      </div>
+    </div>
+    <div class="card"><div class="cardhead"><h2>Governance settings</h2></div>
+      <div class="cardbody"><dl class="kv">
+        <dt>Pricing modes</dt><dd>Contract · Spot · All-in approved · Cost-plus fallback</dd>
+        <dt>Approval thresholds</dt><dd>Spot &gt; $4,000 → Exec · Accessorial &gt; $250 → Ops lead</dd>
+        <dt>Margin alert</dt><dd>&lt; 9% or &gt; 26% flags for review</dd>
+        <dt>Variance alert</dt><dd>±5% vs. lane history</dd>
+        <dt>Scope</dt><dd>Customer- and plant-specific pricing supported</dd>
+        <dt>Version control</dt><dd>Every change stamped: who, when, prior value</dd>
+      </dl></div>
+    </div>
+  </div>`;
+};
+</script>
+<script>
+/* =====================================================
+   VIEW: BILLING, AUDIT & RECONCILIATION
+   ===================================================== */
+VIEWS.billing = function(){
+  if(isCust()) return restrictedView('Billing & Reconciliation');
+  const rows = BILLING.map(b=>`<tr>
+    <td><div class="primaryline">${b.ship}</div><div class="subline"><a href="#" onclick="go('detail','${b.ship}');return false;">Open load</a></div></td>
+    <td class="num money">${b.charge?$money(b.charge):'—'}</td>
+    ${seeBuy()?`<td class="num money">${b.buy?$money(b.buy):'—'}</td><td class="num money">${b.pass?$money(b.pass):'—'}</td>`:''}
+    <td>${b.invoice}</td>
+    ${seeBuy()?`<td>${b.carrierPay}</td>`:''}
+    <td>${b.docs}</td>
+    <td class="num">${b.variance}</td>
+    <td>${b.funding==='Funded'?'<span class="badge g">Funded</span>':'<span class="badge a">'+b.funding+'</span>'}</td>
+    <td><span class="badge ${b.sig}">${b.state}</span></td>
+  </tr>`).join('');
+  return `
+  <div class="viewhead">
+    <div><h1>Billing, Audit & Reconciliation</h1>
+    <div class="sub">Three-way reconciliation on every load: approved customer charge ↔ approved carrier buy + pass-throughs ↔ final invoice and documents. Payments are blocked wherever funding or approval is missing.</div></div>
+    <div class="actions"><button class="btn" onclick="toast('Duplicate scan complete — 0 found (demo)')">Run duplicate scan</button><button class="btn primary" ${readOnly()?'disabled':''} onclick="toast('Billing run prepared (demo)')">Prepare billing run</button></div>
+  </div>
+  <div class="grid cols-4" style="margin-bottom:14px">
+    <div class="kpi"><span class="sig g"></span><div class="lbl">Invoice accuracy (30d)</div><div class="val">99.2%</div><div class="meta">1 variance caught pre-invoice</div></div>
+    <div class="kpi"><span class="sig a"></span><div class="lbl">Billing holds</div><div class="val">2</div><div class="meta">1 claim review · 1 missing POD</div></div>
+    <div class="kpi"><span class="sig g"></span><div class="lbl">Customer invoice aging</div><div class="val">4.1d</div><div class="meta">Avg. days outstanding</div></div>
+    <div class="kpi"><span class="sig g"></span><div class="lbl">Funding control</div><div class="val">OK</div><div class="meta">No carrier pay released ahead of funding</div></div>
+  </div>
+  <div class="notice internal" style="margin-bottom:14px"><b>Funding control:</b> BHD does not finance Latham's carrier-payment or quick-pay obligations. Carrier payment on any load is blocked until the customer charge is approved and funding status is <b>Funded</b> — see the Funding column below.</div>
+  <div class="card" style="margin-bottom:14px"><div class="cardbody flush tablewrap">
+    <table class="data"><thead><tr><th>Load</th><th class="num">Customer charge</th>${seeBuy()?'<th class="num">Carrier buy</th><th class="num">Pass-through</th>':''}<th>Customer invoice</th>${seeBuy()?'<th>Carrier pay</th>':''}<th>Documents</th><th class="num">Variance</th><th>Funding</th><th>State</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+  </div></div>
+  <div class="grid cols-2">
+    <div class="card"><div class="cardhead"><h2>Closeout checklist — BHD-26-1046</h2></div>
+      <div class="cardbody">
+        ${[['POD on file','done'],['Permits reconciled to receipts','done'],['Escort invoice matched','done'],['Accessorials approved','done'],['Customer invoice sent','done'],['Customer payment received','warn'],['Carrier payment released','warn'],['Load closed','open']].map(([t,st])=>`<div class="gate ${st}"><span class="tick">${st==='done'?'✓':st==='warn'?'…':'✕'}</span><div><div class="gt">${t}</div></div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card"><div class="cardhead"><h2>Disputes & audit queue</h2></div>
+      <div class="cardbody flush"><table class="data"><thead><tr><th>Item</th><th>Type</th><th>Status</th></tr></thead><tbody>
+        <tr><td>BHD-26-1047 · claim offset review</td><td>Carrier dispute (pending)</td><td><span class="badge a">In review</span></td></tr>
+        <tr><td>EX-2195 · detention $135</td><td>Accessorial</td><td><span class="badge g">Approved & billed</span></td></tr>
+        <tr><td>Aug permit reconciliation</td><td>Pass-through audit</td><td><span class="badge g">Closed — $0 variance</span></td></tr>
+      </tbody></table></div>
+    </div>
+  </div>`;
+};
+
+/* =====================================================
+   VIEW: REPORTS & SCORECARDS
+   ===================================================== */
+VIEWS.reports = function(){
+  const reports = [
+    ['Plant performance scorecard','Service, cost, exceptions and data quality by plant','Monthly + QBR'],
+    ['Lane performance','OTP/OTD, transit, cost and exception rate by lane','Weekly'],
+    ['Service performance','Pickup/delivery timeliness vs. SLA with root causes','Weekly'],
+    ['Capacity coverage','Primary/backup depth and peak readiness by lane','Monthly'],
+    ['Tender acceptance & equipment confirmation','Acceptance, retenders, confirmation timing','Weekly'],
+    ['Tracking compliance','Ping/update compliance by load','Weekly'],
+    ['Exceptions & root causes','Volume, aging, SLA, corrective and preventive actions','Weekly'],
+    ['Claims','Open/closed claims with documentation status','Monthly'],
+    ['Spend & rate variance','Spend vs. approved rates and lane history','Monthly'],
+    ['Accessorials','Approved accessorials with validation backup','Monthly'],
+    ['Billing accuracy & invoice aging','First-pass accuracy, disputes, aging','Monthly'],
+    ['Data completeness','First-pass intake completeness by field and requester','Weekly'],
+    ['Peak readiness','Surge capacity plan status ahead of season','Monthly'],
+    ['Corrective-action plans','Open CAPs with owners and due dates','Monthly']
+  ];
+  return `
+  <div class="viewhead">
+    <div><h1>Reports & Scorecards</h1>
+    <div class="sub">${isCust()?'Downloadable program reporting for Latham. Every export from this page is customer-safe by construction.':'Program reporting. Customer exports automatically strip carrier names, contacts, MC/DOT numbers, buy rates, internal notes and proprietary capacity data.'}</div></div>
+    <div class="actions"><button class="btn primary" onclick="toast('Export queued — customer-safe filter applied automatically (demo)')">Export selected</button></div>
+  </div>
+  ${isCust()?'<div class="notice info" style="margin-bottom:14px">Exports are generated in <b>customer-safe mode</b>: carrier identity, carrier contacts, MC/DOT numbers, BHD buy rates and internal notes are excluded automatically — this is enforced by the platform, not by manual review.</div>':'<div class="notice internal" style="margin-bottom:14px"><b>Export governance:</b> the customer-safe filter is applied at the data layer for all Latham roles and any report shared externally. Internal exports are watermarked and logged.</div>'}
+  <div class="card"><div class="cardbody flush tablewrap">
+    <table class="data"><thead><tr><th style="width:34px"></th><th>Report</th><th>Contents</th><th>Cadence</th><th></th></tr></thead><tbody>
+    ${reports.map((r,i)=>`<tr><td><input type="checkbox" aria-label="Select ${r[0]}"></td><td class="primaryline">${r[0]}</td><td><div class="subline" style="color:var(--ink)">${r[1]}</div></td><td>${r[2]}</td><td><button class="btn sm" onclick="toast('Downloading ${r[0]} (demo)')">Download</button></td></tr>`).join('')}
+    </tbody></table>
+  </div></div>`;
+};
+
+/* =====================================================
+   VIEW: ADMINISTRATION & GOVERNANCE
+   ===================================================== */
+VIEWS.admin = function(){
+  if(isCust()) return restrictedView('Administration');
+  let tab = ROUTE_ARG || 'contract';
+  window._wire = ()=>{};
+  const tabs = [['contract','Commercial framework'],['access','Roles & permissions'],['rules','Rules & thresholds'],['integrations','Integrations'],['audit','Audit history']];
+  const contract = `<div class="card"><div class="cardhead"><h2>Commercial & contractual record</h2><span class="hint">Recorded operating framework — managed outside the platform, tracked here</span></div>
+    <div class="cardbody flush"><table class="data"><thead><tr><th>Provision</th><th>Status</th></tr></thead><tbody>
+    ${GOVERNANCE.map(g=>`<tr><td class="primaryline">${g[0]}</td><td>${g[2]==='g'?'<span class="badge g">'+g[1]+'</span>':g[2]==='a'?'<span class="badge a">'+g[1]+'</span>':'<span class="badge n">'+g[1]+'</span>'}</td></tr>`).join('')}
+    </tbody></table></div></div>
+    <div class="notice internal" style="margin-top:14px"><b>Why the 12-month extension matters:</b> BHD funds carrier procurement, plant onboarding, workflow configuration, portal development and network stabilization at its own expense. The term covers two peak seasons so the operating model can be proven and scaled before renewal.</div>`;
+  const access = `<div class="grid cols-2">
+    <div class="card"><div class="cardhead"><h2>Roles</h2></div><div class="cardbody flush"><table class="data"><thead><tr><th>Role</th><th>Carrier identity</th><th>Buy rates</th><th>Billing</th><th>Write</th></tr></thead><tbody>
+      ${Object.entries(ROLE_META).map(([k,v])=>`<tr><td class="primaryline">${v.label}</td><td>${v.canSeeCarrier?'<span class="badge g">Yes</span>':'<span class="badge r">Never</span>'}</td><td>${v.canSeeBuy?'<span class="badge g">Yes</span>':'<span class="badge r">Never</span>'}</td><td>${v.billing?'<span class="badge g">Yes</span>':'<span class="badge n">No</span>'}</td><td>${v.readOnly?'<span class="badge n">Read-only (logged)</span>':v.customer?'<span class="badge b">Scoped</span>':'<span class="badge g">Yes</span>'}</td></tr>`).join('')}
+    </tbody></table></div></div>
+    <div class="card"><div class="cardhead"><h2>Field- and plant-level controls</h2></div><div class="cardbody"><dl class="kv">
+      <dt>Field-level permissions</dt><dd>Carrier name, MC/DOT, contacts, buy rate, internal notes = restricted class</dd>
+      <dt>Plant-level permissions</dt><dd>Latham Plant users scoped to their plant only</dd>
+      <dt>Customer-safe exports</dt><dd>Enforced at data layer for all customer roles</dd>
+      <dt>Impersonation / test mode</dt><dd>Admins may view-as any role; sessions watermarked + logged</dd>
+      <dt>Notification scrubbing</dt><dd>Outbound customer emails pass the same restricted-field filter</dd>
+    </dl>
+    <button class="btn" style="margin-top:10px" onclick="toast('View-as session started — watermarked and logged (demo)')">Start view-as session</button>
+    </div></div></div>`;
+  const rules = `<div class="grid cols-2">
+    <div class="card"><div class="cardhead"><h2>Required-field & gate rules</h2></div><div class="cardbody"><dl class="kv">
+      <dt>Intake hard-required</dt><dd>Dims, weight, consignee contact, unloading method (dealer/residential), PO</dd>
+      <dt>Tender gate</dt><dd>13 gates — all must pass; executive override only</dd>
+      <dt>Expedited service</dt><dd>Blocked unless consignee contact verified</dd>
+      <dt>NC width rule</dt><dd>≥ 15'6" auto-flags superload review +1 day lead time</dd>
+      <dt>Escort auto-classification</dt><dd>By state thresholds; site escorts manual</dd>
+    </dl></div></div>
+    <div class="card"><div class="cardhead"><h2>SLA & escalation configuration</h2></div><div class="cardbody"><dl class="kv">
+      <dt>SLA targets</dt><dd>OTP 95% · OTD 93% · Tracking 95% · Exception ack 2h</dd>
+      <dt>Escalation tree — JLW</dt><dd>Plant shipping → BHD Cust Ops → BHD on-call → BHD Exec ↔ Latham named contacts</dd>
+      <dt>Approval thresholds</dt><dd>Spot &gt; $4,000 Exec · Accessorial &gt; $250 Ops lead · Override = Exec only</dd>
+      <dt>Notifications</dt><dd>Per-user preferences; customer notices use customer-safe templates</dd>
+    </dl></div></div></div>`;
+  const integrations = `<div class="card"><div class="cardhead"><h2>Integrations</h2></div><div class="cardbody flush"><table class="data"><thead><tr><th>Integration</th><th>Purpose</th><th>Status</th></tr></thead><tbody>
+    <tr><td class="primaryline">Email ingestion</td><td>Captures shipment email traffic to the load record during transition</td><td><span class="badge g">Active — audit trail on</span></td></tr>
+    <tr><td class="primaryline">IFS / ERP (Latham)</td><td>Order + invoice integration replacing email flow</td><td><span class="badge a">Scoping — target Q1 2027</span></td></tr>
+    <tr><td class="primaryline">Permit services</td><td>State permit filing + status</td><td><span class="badge g">Active</span></td></tr>
+    <tr><td class="primaryline">Tracking (ELD / app)</td><td>Position + milestone feed</td><td><span class="badge g">Active</span></td></tr>
+    <tr><td class="primaryline">Accounting</td><td>Invoices, carrier pay, funding status</td><td><span class="badge g">Active</span></td></tr>
+  </tbody></table></div></div>`;
+  const audit = `<div class="card"><div class="cardhead"><h2>Audit history</h2><span class="hint">Every operational and financial decision is traceable</span></div><div class="cardbody flush"><table class="data"><thead><tr><th>When</th><th>User</th><th>Action</th><th>Record</th></tr></thead><tbody>
+    <tr><td>Sep 8, 09:41</td><td>R. Ostrander (Capacity)</td><td>Filed TN permit on estimate</td><td>BHD-26-1045</td></tr>
+    <tr><td>Sep 8, 08:20</td><td>M. Delgado (Cust Ops)</td><td>Sent missing-data request to customer</td><td>EX-2203</td></tr>
+    <tr><td>Sep 7, 15:02</td><td>R. Ostrander (Capacity)</td><td>Rebooked escorts; internal note added</td><td>BHD-26-1043</td></tr>
+    <tr><td>Sep 7, 14:12</td><td>G. Harris (Executive)</td><td>Approved NC permit expedite fee $95</td><td>BHD-26-1043</td></tr>
+    <tr><td>Sep 7, 10:44</td><td>System</td><td>Tender accepted; equipment confirmed</td><td>BHD-26-1042</td></tr>
+    <tr><td>Sep 6, 12:40</td><td>T. Nguyen (Billing)</td><td>Approved detention $135 with GPS backup</td><td>EX-2195</td></tr>
+    <tr><td>Sep 5, 16:41</td><td>K. Whitfield (Cust Ops)</td><td>Opened damage exception; customer notified</td><td>EX-2199 / BHD-26-1047</td></tr>
+    <tr><td>Sep 4, 08:22</td><td>System</td><td>Auto-retendered to backup after rejection (12 min)</td><td>BHD-26-1038</td></tr>
+  </tbody></table></div></div>`;
+  const body = {contract,access,rules,integrations,audit}[tab];
+  return `
+  <div class="viewhead"><div><h1>Administration & Governance</h1>
+  <div class="sub">Access control, operating rules, contractual record, integrations and the complete audit history.</div></div></div>
+  <div class="tabs">${tabs.map(t=>`<button class="${t[0]===tab?'on':''}" onclick="go('admin','${t[0]}')">${t[1]}</button>`).join('')}</div>
+  ${body}`;
+};
+
+/* ===== boot ===== */
+setRole('bhd-exec');
+</script>
+</body>
+</html>
